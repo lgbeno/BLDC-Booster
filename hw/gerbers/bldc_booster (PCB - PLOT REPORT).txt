@@ -1,13 +1,13 @@
 PLOT REPORT
 -----------
 
-Report File    : C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster (PCB - PLOT REPORT).txt
+Report File    : C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster (PCB - PLOT REPORT).txt
 Report Written : Saturday, September 01, 2012
-Design Path    : C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster.pcb
+Design Path    : C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster.pcb
 Design Title   : 
 Created        : 8/15/2012 3:13:43 AM
-Last Saved     : 9/1/2012 2:36:21 PM
-Editing Time   : 12495 min
+Last Saved     : 9/1/2012 8:35:59 PM
+Editing Time   : 12538 min
 Units          : mm (precision 2)
 
 DEVICE SETTINGS
@@ -40,7 +40,7 @@ PLOTS OUTPUT
 Gerber Output
 -------------
 
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Top Documentation.gbr"
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Top Documentation.gbr"
 
     Layers:
     -------
@@ -55,7 +55,7 @@ Gerber Output
 Gerber Output
 -------------
 
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Top Silkscreen.gbr"
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Top Silkscreen.gbr"
 
     Layers:
     -------
@@ -84,7 +84,7 @@ Gerber Output
 Gerber Output
 -------------
 
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Top Copper.gbr"
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Top Copper.gbr"
 
     Layers:
     -------
@@ -119,7 +119,7 @@ Gerber Output
 Gerber Output
 -------------
 
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Top Solder Mask.gbr"
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Top Solder Mask.gbr"
 
     Layers:
     -------
@@ -148,30 +148,7 @@ Gerber Output
 Gerber Output
 -------------
 
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Top Paste Mask.gbr"
-
-    Layers:
-    -------
-    Top Paste Mask
-    Board Outlines
-
-    D-Code    Shape  (thou)
-    -----------------------
-    D10       Round 5.00
-    D99       Rectangle 9.75 X 13.69 Rotation 90
-    D100       Rectangle 37.31 X 33.37
-    D101       Rectangle 21.56 X 29.43 Rotation 90
-    D102       Rectangle 21.56 X 29.43
-    D103       Rectangle 19.59 X 62.90
-    D104       Rectangle 9.75 X 64.87 Rotation 90
-    D105       Rectangle 16.83 X 41.24
-    D106       Square 72.74
-
-
-Gerber Output
--------------
-
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Bottom Copper.gbr"
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Bottom Copper.gbr"
 
     Layers:
     -------
@@ -189,13 +166,13 @@ Gerber Output
     D75       Round 60.00
     D79       Round 19.69
     D81       Round 10.00
-    D107       Round 21.65
+    D99       Round 21.65
 
 
 Gerber Output
 -------------
 
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Bottom Silkscreen.gbr"
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Bottom Silkscreen.gbr"
 
     Layers:
     -------
@@ -205,12 +182,16 @@ Gerber Output
     D-Code    Shape  (thou)
     -----------------------
     D10       Round 5.00
+    D11       Round 11.81
+    D16       Round 1.00
+    D79       Round 19.69
+    D84       Round 15.75
 
 
 Gerber Output
 -------------
 
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Bottom Documentation.gbr"
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Bottom Documentation.gbr"
 
     Layers:
     -------
@@ -225,7 +206,7 @@ Gerber Output
 Gerber Output
 -------------
 
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Bottom Solder Mask.gbr"
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Bottom Solder Mask.gbr"
 
     Layers:
     -------
@@ -243,21 +224,6 @@ Gerber Output
     D95       Round 66.00
 
 
-Gerber Output
--------------
-
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Bottom Paste Mask.gbr"
-
-    Layers:
-    -------
-    Bottom Paste Mask
-    Board Outlines
-
-    D-Code    Shape  (thou)
-    -----------------------
-    D10       Round 5.00
-
-
 NC Drill Output
 ---------------
 
@@ -267,7 +233,7 @@ NC Drill Output
     Plated Slots
     Plated Board Outlines
 
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Drill Data - Through Hole.drl"
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Drill Data - Through Hole.drl"
 
 
     Tool             Size        Count  ID
@@ -290,7 +256,7 @@ NC Drill Output
     Unplated Slots
     Unplated Board Outlines
 
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Drill Data - Through Hole (Unplated).drl"
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Drill Data - Through Hole (Unplated).drl"
 
 
     Tool             Size        Count  ID
@@ -303,7 +269,7 @@ NC Drill Output
 Gerber Output
 -------------
 
-    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Drill Ident Drawing - Through Hole.gbr"
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Drill Ident Drawing - Through Hole.gbr"
 
     Layers:
     -------
@@ -324,7 +290,7 @@ Gerber Output
     D-Code    Shape  (thou)
     -----------------------
     D10       Round 5.00
-    D108       Round 100.00
+    D100       Round 100.00
 
 
 End Of Report.
