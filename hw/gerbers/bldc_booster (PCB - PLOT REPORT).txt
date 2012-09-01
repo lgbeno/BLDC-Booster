@@ -1,0 +1,330 @@
+PLOT REPORT
+-----------
+
+Report File    : C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster (PCB - PLOT REPORT).txt
+Report Written : Saturday, September 01, 2012
+Design Path    : C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster.pcb
+Design Title   : 
+Created        : 8/15/2012 3:13:43 AM
+Last Saved     : 9/1/2012 2:36:21 PM
+Editing Time   : 12495 min
+Units          : mm (precision 2)
+
+DEVICE SETTINGS
+---------------
+
+---------------
+Gerber Settings
+---------------
+
+    Leading zero suppression.
+    G01 assumed throughout.
+    Line termination <*> <CR> <LF>.
+    2.3 format absolute inches.
+    Format commands defined in Gerber file.
+    Aperture table defined in Gerber file.
+    Hardware arcs allowed.
+
+--------------
+Drill Settings
+--------------
+
+    Excellon Format 1
+    Format 2.3 absolute in mm.
+    No zero suppression.
+
+
+PLOTS OUTPUT
+------------
+
+Gerber Output
+-------------
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Top Documentation.gbr"
+
+    Layers:
+    -------
+    Top Documentation
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+
+
+Gerber Output
+-------------
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Top Silkscreen.gbr"
+
+    Layers:
+    -------
+    Top Silkscreen
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+    D11       Round 11.81
+    D12       Round 2.76
+    D13       Round 3.94
+    D14       Round 7.87
+    D15       Round 3.54
+    D16       Round 1.00
+    D17       Round 3.15
+    D18       Round 5.91
+    D19       Round 1.97
+    D70       Round 4.00
+    D71       Round 1.28
+    D20       Round 6.00
+    D21       Round 16.00
+    D22       Round 8.00
+
+
+Gerber Output
+-------------
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Top Copper.gbr"
+
+    Layers:
+    -------
+    Top Copper
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+    D23       Round 27.56
+    D24       Round 32.00
+    D25       Rectangle 15.75 X 19.69 Rotation 90
+    D26       Rectangle 43.31 X 39.37
+    D27       Rectangle 27.56 X 35.43 Rotation 90
+    D28       Rectangle 27.56 X 35.43
+    D29       Rectangle 25.59 X 68.90
+    D72       Round 65.00
+    D73       Round 90.55
+    D74       Square 60.00
+    D75       Round 60.00
+    D76       Rectangle 15.75 X 70.87 Rotation 90
+    D77       Rectangle 22.83 X 47.24
+    D78       Square 78.74
+    D79       Round 19.69
+    D80       Round 25.00
+    D81       Round 10.00
+    D82       Round 50.00
+    D83       Round 17.72
+    D84       Round 15.75
+
+
+Gerber Output
+-------------
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Top Solder Mask.gbr"
+
+    Layers:
+    -------
+    Top Solder Mask
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+    D85       Round 33.56
+    D86       Round 38.00
+    D87       Rectangle 21.75 X 25.69 Rotation 90
+    D88       Rectangle 49.31 X 45.37
+    D89       Rectangle 33.56 X 41.43 Rotation 90
+    D90       Rectangle 33.56 X 41.43
+    D91       Rectangle 31.59 X 74.90
+    D92       Round 71.00
+    D93       Round 96.55
+    D94       Square 66.00
+    D95       Round 66.00
+    D96       Rectangle 21.75 X 76.87 Rotation 90
+    D97       Rectangle 28.83 X 53.24
+    D98       Square 84.74
+
+
+Gerber Output
+-------------
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Top Paste Mask.gbr"
+
+    Layers:
+    -------
+    Top Paste Mask
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+    D99       Rectangle 9.75 X 13.69 Rotation 90
+    D100       Rectangle 37.31 X 33.37
+    D101       Rectangle 21.56 X 29.43 Rotation 90
+    D102       Rectangle 21.56 X 29.43
+    D103       Rectangle 19.59 X 62.90
+    D104       Rectangle 9.75 X 64.87 Rotation 90
+    D105       Rectangle 16.83 X 41.24
+    D106       Square 72.74
+
+
+Gerber Output
+-------------
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Bottom Copper.gbr"
+
+    Layers:
+    -------
+    Bottom Copper
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+    D23       Round 27.56
+    D24       Round 32.00
+    D72       Round 65.00
+    D73       Round 90.55
+    D74       Square 60.00
+    D75       Round 60.00
+    D79       Round 19.69
+    D81       Round 10.00
+    D107       Round 21.65
+
+
+Gerber Output
+-------------
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Bottom Silkscreen.gbr"
+
+    Layers:
+    -------
+    Bottom Silkscreen
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+
+
+Gerber Output
+-------------
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Bottom Documentation.gbr"
+
+    Layers:
+    -------
+    Bottom Documentation
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+
+
+Gerber Output
+-------------
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Bottom Solder Mask.gbr"
+
+    Layers:
+    -------
+    Bottom Solder Mask
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+    D85       Round 33.56
+    D86       Round 38.00
+    D92       Round 71.00
+    D93       Round 96.55
+    D94       Square 66.00
+    D95       Round 66.00
+
+
+Gerber Output
+-------------
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Bottom Paste Mask.gbr"
+
+    Layers:
+    -------
+    Bottom Paste Mask
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+
+
+NC Drill Output
+---------------
+
+    Output:
+    -------
+    Plated Round Drill Holes
+    Plated Slots
+    Plated Board Outlines
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Drill Data - Through Hole.drl"
+
+
+    Tool             Size        Count  ID
+    --------------------------------------
+    T001        00.016 in           24   A
+    T002        00.016 in           31   B
+    T003        00.035 in            2   E
+    T004        00.041 in           20   C
+    T005        00.051 in            5   D
+    --------------------------------------
+    All                             82
+    --------------------------------------
+
+NC Drill Output
+---------------
+
+    Output:
+    -------
+    Unplated Round Drill Holes
+    Unplated Slots
+    Unplated Board Outlines
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Drill Data - Through Hole (Unplated).drl"
+
+
+    Tool             Size        Count  ID
+    --------------------------------------
+    T001        00.025 in            1   
+    --------------------------------------
+    All                              1
+    --------------------------------------
+
+Gerber Output
+-------------
+
+    "C:\lgbeno\BLDC-Booster2\Hardware\bldc_booster - Drill Ident Drawing - Through Hole.gbr"
+
+    Layers:
+    -------
+    Board Outlines
+
+    Drill Ident Drawing
+    -------------------
+
+    Drill     Plated    Size      Shape     ID        
+    --------------------------------------------------
+    16        Y         100       Round     A         
+    16        Y         100       Round     B         
+    41        Y         100       Round     C         
+    51        Y         100       Round     D         
+    35        Y         100       Round     E         
+    --------------------------------------------------
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+    D108       Round 100.00
+
+
+End Of Report.
