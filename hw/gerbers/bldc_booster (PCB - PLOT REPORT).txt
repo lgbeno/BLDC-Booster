@@ -2,12 +2,12 @@ PLOT REPORT
 -----------
 
 Report File    : C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster (PCB - PLOT REPORT).txt
-Report Written : Saturday, September 01, 2012
+Report Written : Sunday, September 02, 2012
 Design Path    : C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster.pcb
 Design Title   : 
 Created        : 8/15/2012 3:13:43 AM
-Last Saved     : 9/1/2012 10:21:41 PM
-Editing Time   : 12650 min
+Last Saved     : 9/2/2012 11:02:42 PM
+Editing Time   : 14046 min
 Units          : mm (precision 2)
 
 DEVICE SETTINGS
@@ -148,6 +148,29 @@ Gerber Output
 Gerber Output
 -------------
 
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Top Paste Mask.gbr"
+
+    Layers:
+    -------
+    Top Paste Mask
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
+    D101       Rectangle 9.75 X 13.69 Rotation 90
+    D102       Rectangle 37.31 X 33.37
+    D103       Rectangle 21.56 X 29.43 Rotation 90
+    D104       Rectangle 21.56 X 29.43
+    D105       Rectangle 19.59 X 62.90
+    D106       Rectangle 9.75 X 64.87 Rotation 90
+    D107       Rectangle 16.83 X 41.24
+    D108       Square 72.74
+
+
+Gerber Output
+-------------
+
     "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Bottom Copper.gbr"
 
     Layers:
@@ -222,6 +245,21 @@ Gerber Output
     D93       Round 96.55
     D94       Square 66.00
     D95       Round 66.00
+
+
+Gerber Output
+-------------
+
+    "C:\Users\luke.beno\Desktop\BLDC-Booster\hw\bldc_booster - Bottom Paste Mask.gbr"
+
+    Layers:
+    -------
+    Bottom Paste Mask
+    Board Outlines
+
+    D-Code    Shape  (thou)
+    -----------------------
+    D10       Round 5.00
 
 
 NC Drill Output
