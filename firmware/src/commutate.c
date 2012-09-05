@@ -1,4 +1,4 @@
-/** \copyright
+/** \copyright BSD
  * Copyright (c) 2012, Stuart W. Baker
  * All rights reserved.
  *
@@ -24,3 +24,84 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+#include "config.h"
+
+#define S1      6
+#define S2      4
+#define S3      5
+#define S4      1
+#define S5      3
+#define S6      2
+
+/** Advance the commutation state.
+ * @param move_to valid values are 1-6
+ */
+void commutate(unsigned int move_to)
+{
+    switch (move_to)
+    {
+        default:
+            break;
+        case S1:
+            P2SEL = PCL;
+#if INVERT_HIGH
+            P2OUT |= PBH | PCH;
+            P2OUT &= ~PAH;
+#else
+            P2OUT &= ~(PBH | PCH);
+            P2OUT |= PAH;
+#endif
+            break;
+        case S2:
+            P2SEL = PCL;
+#if INVERT_HIGH
+            P2OUT |= PAH | PCH;
+            P2OUT &= ~PBH;
+#else
+            P2OUT &= ~(PAH | PCH);
+            P2OUT |= PBH;
+#endif
+            break;
+        case S3:
+            P2SEL = PAL;
+#if INVERT_HIGH
+            P2OUT |= PAH | PCH;
+            P2OUT &= ~PBH;
+#else
+            P2OUT &= ~(PAH | PCH);
+            P2OUT |= PBH;
+#endif
+            break;
+        case S4:
+            P2SEL = PAL;
+#if INVERT_HIGH
+            P2OUT |= PAH | PBH;
+            P2OUT &= ~PCH;
+#else
+            P2OUT &= ~(PAH | PBH);
+            P2OUT |= PCH;
+#endif
+            break;
+        case S5:
+            P2SEL = PBL;
+#if INVERT_HIGH
+            P2OUT |= PAH | PBH;
+            P2OUT &= ~PCH;
+#else
+            P2OUT &= ~(PAH | PBH);
+            P2OUT |= PCH;
+#endif
+            break;
+        case S6:
+            P2SEL = PBL;
+#if INVERT_HIGH
+            P2OUT |= PBH | PCH;
+            P2OUT &= ~PAH;
+#else
+            P2OUT &= ~(PBH | PCH);
+            P2OUT |= PAH;
+#endif
+            break;
+    }
+}

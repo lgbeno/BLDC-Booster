@@ -25,24 +25,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <msp430.h>
+#include <stdint.h>
+#include "config.h"
 
-#define INVERT_HIGH 1
-#define INVERT_LOW  0
+/** Retrieve the hall effect sensor value.
+ *
+ * @return valid values are between 1 and 6
+ */
+unsigned int hall(void)
+{
+    uint8_t hall;
 
-#define PAL BIT1
-#define PAH BIT0
-#define PBL BIT2
-#define PBH BIT3
-#define PCL BIT4
-#define PCH BIT5
+    hall =  (HALL_A_PORT & HALL_A_MASK) >> HALL_A_SHIFT;
+    hall += (HALL_B_PORT & HALL_B_MASK) >> HALL_B_SHIFT;
+    hall += (HALL_C_PORT & HALL_C_MASK) >> HALL_C_SHIFT;
 
-#define HALL_A_PORT  P2IN
-#define HALL_B_PORT  P2IN
-#define HALL_C_PORT  P1IN
-#define HALL_A_MASK  0x40
-#define HALL_B_MASK  0x80
-#define HALL_C_MASK  0x80
-#define HALL_A_SHIFT 6
-#define HALL_B_SHIFT 6
-#define HALL_C_SHIFT 5
+    return hall;
+}

@@ -25,24 +25,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <msp430.h>
+#ifndef _pwm_h_
+#define _pwm_h_
 
-#define INVERT_HIGH 1
-#define INVERT_LOW  0
+/** Initialize PWM channel 1.
+ *
+ * @param percent_duty_cycle initial duty cycle, 0 - 100
+ */
+void pwm1_init(unsigned int percent_duty_cycle);
 
-#define PAL BIT1
-#define PAH BIT0
-#define PBL BIT2
-#define PBH BIT3
-#define PCL BIT4
-#define PCH BIT5
+/** Update PWM channel 1 duty cycle.
+ *
+ * @param percent initial duty cycle, 0 - 100
+ */
+void pwm1_duty_cycle(unsigned int percent);
 
-#define HALL_A_PORT  P2IN
-#define HALL_B_PORT  P2IN
-#define HALL_C_PORT  P1IN
-#define HALL_A_MASK  0x40
-#define HALL_B_MASK  0x80
-#define HALL_C_MASK  0x80
-#define HALL_A_SHIFT 6
-#define HALL_B_SHIFT 6
-#define HALL_C_SHIFT 5
+/** Initialize PWM channel 0.
+ *
+ * @param percent_duty_cycle initial duty cycle, 0 - 100
+ */
+void pwm0_init(unsigned int percent_duty_cycle);
+
+/** Update PWM channel 0 duty cycle.
+ *
+ * @param percent initial duty cycle, 0 - 100
+ */
+void pwm0_duty_cycle(unsigned int percent);
+
+#endif /* _pwm_h_ */

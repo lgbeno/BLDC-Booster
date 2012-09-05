@@ -25,9 +25,80 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "config.h"
+
+#include "commutate.h"
+#include "hall.h"
+#include "pwm.h"
+
+static unsigned int count = 0;
+
 /*
  * main.c
  */
-void main(void) {
-	
+void main(void)
+{
+    /* Disable watchdog */
+    WDTCTL = WDTPW + WDTHOLD;
+
+    /* setup clock for 16 MHz internal DCO */
+    DCOCTL = 0;
+    BCSCTL1 = CALBC1_16MHZ;
+    DCOCTL = CALDCO_16MHZ;
+    BCSCTL2 = 0;
+    BCSCTL3 = 0;
+
+    /* drive output latches */
+#if INVERT_LOW
+    P2OUT = PAL | PBL | PCL;
+#else
+    P2OUT = 0;
+#endif
+#if INVERT_HIGH
+    P2OUT |= PAH | PBH | PCH;
+#endif
+    P1OUT = 0;
+
+    /* set P2.0 up for PWM */
+    P2SEL = 0;
+    P2SEL2 = 0;
+
+    /* make all gpio outputs */
+    P1DIR = BIT0 | BIT2 | BIT6;
+    P2DIR = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5;
+    //P2REN = 0xff;
+
+    /* disable port interrupts */
+    P1IES = 0;
+    P1IFG = 0;
+    P2IES = 0;
+    P2IFG = 0;
+
+    pwm1_init(10);
+
+    TA0CCTL2 = CM_0 + CCIS_0 + OUTMOD_6;
+    TA0CCTL1 = CM_0 + CCIS_0 + OUTMOD_6;
+    TA0CCTL0 = CM_0 + CCIS_0 + OUTMOD_6;
+    TA0CCR0 = 1600; /* roughtly 10 kHz */
+    TA0CTL = TASSEL_2 + ID_0 + MC_1 + TAIE;
+
+    __enable_interrupt();
+
+    for (;;)
+    {
+        TA0CTL &= ~TAIE;
+
+        commutate(hall());
+
+        TA0CTL |= TAIE;
+    }
+
+}
+
+__interrupt void TIMER0_A1_ISR(void);
+#pragma vector=TIMER0_A1_VECTOR
+__interrupt void TIMER0_A1_ISR(void)
+{
+    TA0CTL &= ~TAIFG;
+    count++;
 }

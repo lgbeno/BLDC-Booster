@@ -102,24 +102,34 @@
 			<locationURI>PARENT-2-PROJECT_LOC/config/config.h</locationURI>
 		</link>
 		<link>
-			<name>config/config.h~</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/config/config.h~</locationURI>
-		</link>
-		<link>
 			<name>include/commutate.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/include/commutate.h</locationURI>
 		</link>
 		<link>
-			<name>src/.commutate.c.swp</name>
+			<name>include/hall.h</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/.commutate.c.swp</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/include/hall.h</locationURI>
+		</link>
+		<link>
+			<name>include/pwm.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/include/pwm.h</locationURI>
 		</link>
 		<link>
 			<name>src/commutate.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/src/commutate.c</locationURI>
+		</link>
+		<link>
+			<name>src/hall.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/src/hall.c</locationURI>
+		</link>
+		<link>
+			<name>src/pwm.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/src/pwm.c</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

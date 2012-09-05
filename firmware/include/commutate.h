@@ -24,3 +24,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+#ifndef _commutate_h_
+#define _commutate_h_
+
+/** Advance the commutation state.
+ * @param move_to valid values are 1-6
+ */
+void commutate(unsigned int move_to);
+
+#endif /* _commutate_h_ */
