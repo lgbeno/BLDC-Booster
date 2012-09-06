@@ -26,10 +26,10 @@
  */
 
 #include "config.h"
-
-#include "commutate.h"
-#include "hall.h"
 #include "pwm.h"
+#include "hall.h"
+#include "commutate.h"
+#include "tinystdio.h"
 
 static unsigned int count = 0;
 
@@ -59,6 +59,10 @@ void main(void)
 #endif
     P1OUT = 0;
 
+    /* Enable UART */
+    P1SEL = BIT1 | BIT2;
+    P1SEL2 = BIT1 | BIT2;
+
     /* set P2.0 up for PWM */
     P2SEL = 0;
     P2SEL2 = 0;
@@ -82,6 +86,16 @@ void main(void)
     TA0CCR0 = 1600; /* roughtly 10 kHz */
     TA0CTL = TASSEL_2 + ID_0 + MC_1 + TAIE;
 
+    /* setup UART */
+    UCA0CTL0 = 0;
+    UCA0CTL1 = UCSSEL_2;
+    UCA0BR0 = 131;
+    UCA0BR1 = 6;
+    UCA0MCTL = UCBRS_1;
+    IE2 |= UCA0RXIE;
+
+    printf("hello world\n");
+
     __enable_interrupt();
 
     for (;;)
@@ -94,6 +108,7 @@ void main(void)
     }
 
 }
+
 
 __interrupt void TIMER0_A1_ISR(void);
 #pragma vector=TIMER0_A1_VECTOR

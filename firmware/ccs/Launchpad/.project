@@ -97,6 +97,11 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>tinyclib</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
 			<name>config/config.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/config/config.h</locationURI>
@@ -117,6 +122,16 @@
 			<locationURI>PARENT-2-PROJECT_LOC/include/pwm.h</locationURI>
 		</link>
 		<link>
+			<name>include/serial.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/include/serial.h</locationURI>
+		</link>
+		<link>
+			<name>include/tinystdio.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/include/tinystdio.h</locationURI>
+		</link>
+		<link>
 			<name>src/commutate.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/src/commutate.c</locationURI>
@@ -130,6 +145,36 @@
 			<name>src/pwm.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/src/pwm.c</locationURI>
+		</link>
+		<link>
+			<name>src/serial.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/src/serial.c</locationURI>
+		</link>
+		<link>
+			<name>tinyclib/getchar.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/tinyclib/getchar.c</locationURI>
+		</link>
+		<link>
+			<name>tinyclib/gets.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/tinyclib/gets.c</locationURI>
+		</link>
+		<link>
+			<name>tinyclib/printf.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/tinyclib/printf.c</locationURI>
+		</link>
+		<link>
+			<name>tinyclib/putchar.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/tinyclib/putchar.c</locationURI>
+		</link>
+		<link>
+			<name>tinyclib/puts.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/tinyclib/puts.c</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
