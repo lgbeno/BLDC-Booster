@@ -25,12 +25,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
-#include "console.h"
+#include <stdio.h>
 
-int main(int argc, char **argv, char **envp)
-{
-    console_start(1);
-    return 0;
-}
+/** Command function pointer type
+ */
+typedef int (*ConsoleFunction)(FILE *, int, const char **, void *);
 
+/** Add a command to the debug console
+ * @param cmd command string
+ * @param callback callback function
+ * @param context context pointer passed to callback
+ */
+void console_add(const char* cmd, ConsoleFunction callback, void *context);
+
+/** Start the debug console.
+ * @param consume Consume the calling thread, 1 = yes, 0 = no
+ */
+void console_start(int consume);
+
+#define COMMAND_OK 0
+#define COMMAND_ERROR -1
