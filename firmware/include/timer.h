@@ -25,21 +25,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _serial_h_
-#define _serial_h_
+#ifndef _timer_h_
+#define _timer_h_
 
-#include <config.h>
+#include <stdint.h>
 
-#define SERIAL_BUF_SIZE 16
-extern char rxBuf[SERIAL_BUF_SIZE];
-extern char txBuf[SERIAL_BUF_SIZE];
-extern int txIndexWr;
-extern int txIndexRd;
-extern int rxIndexWr;
-extern int rxIndexRd;
-
-/** Initialize serial driver.
+/** Initialize the free running timer based off of timer A0.
  */
-void serial_init(void);
+void timera0_init(void);
 
-#endif /* _serial_h_ */
+/** Initialize the free running timer based off of timer A1.
+ */
+void timera1_init(void);
+
+/** Get the current time.
+ *
+ * @return current time in microseconds since startup
+ */
+uint32_t get_time(void);
+
+#endif /* _timer_h_ */

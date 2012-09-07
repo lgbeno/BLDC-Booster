@@ -127,6 +127,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/include/serial.h</locationURI>
 		</link>
 		<link>
+			<name>include/timer.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/include/timer.h</locationURI>
+		</link>
+		<link>
 			<name>include/tinystdio.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/include/tinystdio.h</locationURI>
@@ -150,6 +155,11 @@
 			<name>src/serial.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/src/serial.c</locationURI>
+		</link>
+		<link>
+			<name>src/timer.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/src/timer.c</locationURI>
 		</link>
 		<link>
 			<name>tinyclib/getchar.c</name>

@@ -28,10 +28,10 @@
 #include "config.h"
 #include "pwm.h"
 #include "hall.h"
+#include "timer.h"
+#include "serial.h"
 #include "commutate.h"
 #include "tinystdio.h"
-
-static unsigned int count = 0;
 
 /*
  * main.c
@@ -79,20 +79,8 @@ void main(void)
     P2IFG = 0;
 
     pwm1_init(10);
-
-    TA0CCTL2 = CM_0 + CCIS_0 + OUTMOD_6;
-    TA0CCTL1 = CM_0 + CCIS_0 + OUTMOD_6;
-    TA0CCTL0 = CM_0 + CCIS_0 + OUTMOD_6;
-    TA0CCR0 = 1600; /* roughtly 10 kHz */
-    TA0CTL = TASSEL_2 + ID_0 + MC_1 + TAIE;
-
-    /* setup UART */
-    UCA0CTL0 = 0;
-    UCA0CTL1 = UCSSEL_2;
-    UCA0BR0 = 131;
-    UCA0BR1 = 6;
-    UCA0MCTL = UCBRS_1;
-    IE2 |= UCA0RXIE;
+    timera0_init();
+    serial_init();
 
     printf("hello world\n");
 
@@ -100,20 +88,9 @@ void main(void)
 
     for (;;)
     {
-        TA0CTL &= ~TAIE;
-
         commutate(hall());
-
-        TA0CTL |= TAIE;
     }
 
 }
 
 
-__interrupt void TIMER0_A1_ISR(void);
-#pragma vector=TIMER0_A1_VECTOR
-__interrupt void TIMER0_A1_ISR(void)
-{
-    TA0CTL &= ~TAIFG;
-    count++;
-}

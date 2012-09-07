@@ -34,6 +34,19 @@ int txIndexRd = 0;
 int rxIndexWr = 0;
 int rxIndexRd = 0;
 
+/** Initialize serial driver.
+ */
+void serial_init(void)
+{
+    /* setup UART */
+    UCA0CTL0 = 0;
+    UCA0CTL1 = UCSSEL_2;
+    UCA0BR0 = 131;
+    UCA0BR1 = 6;
+    UCA0MCTL = UCBRS_1;
+    IE2 |= UCA0RXIE;
+}
+
 __interrupt void USCIAB0RX_ISR(void);
 #pragma vector=USCIAB0RX_VECTOR
 __interrupt void USCIAB0RX_ISR(void)
