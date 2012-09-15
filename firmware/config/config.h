@@ -27,8 +27,8 @@
 
 #include <msp430.h>
 
-#define INVERT_HIGH 1
-#define INVERT_LOW  0
+#define INVERT_HIGH 0
+#define INVERT_LOW  1
 
 #define PAL BIT1
 #define PAH BIT0

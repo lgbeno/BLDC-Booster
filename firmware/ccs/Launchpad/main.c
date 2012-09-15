@@ -78,9 +78,13 @@ void main(void)
     P2IES = 0;
     P2IFG = 0;
 
-    pwm1_init(10);
+    pwm1_init(60);
     timera0_init();
     serial_init();
+    ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_3; //+ ADC10DIV2 + ADC10DIV1 + ADC10DIV0;
+    ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable
+    ADC10CTL0 |= ENC;                         // ADC10 Enable
+    ADC10AE0 |= 0x08;                         // P1.3 ADC10 option select*/
 
     printf("hello world\n");
 
@@ -93,4 +97,14 @@ void main(void)
 
 }
 
+// ADC10 interrupt service routine
+#pragma vector=ADC10_VECTOR
+__interrupt void ADC10_ISR(void)
+{
+	//P1OUT ^= 0x40;
+	/*if (ADC10MEM < 0x155)                     // ADC10MEM = A1 > 0.5V?
+	   // P1OUT &= ~0x40;                         // Clear P1.0 LED off
+	  else
+	   // P1OUT |= 0x40;                          // Set P1.0 LED on*/
+}
 

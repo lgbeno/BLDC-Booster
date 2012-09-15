@@ -41,13 +41,13 @@ void pwm1_init(unsigned int percent_duty_cycle)
     TA1CCTL1 = CM_0 + CCIS_0 + OUTMOD_6;
     TA1CCTL0 = CM_0 + CCIS_0 + OUTMOD_6;
 
-    TA1CCR0 = 800; /* roughly 10 kHz */
+    TA1CCR0 = 400; /* roughly 20 kHz */
     pwm1_duty_cycle(percent_duty_cycle);
 
     /* TA1CTL, Timer_A3 Control Register
      * SMCLK source, divide by 1, up/down mode
      */
-    TA1CTL = TASSEL_2 + ID_0 + MC_3;
+    TA1CTL = TASSEL_2 + ID_0 + MC_3 + TAIE;
 }
 
 /** Update PWM channel 1 duty cycle.
@@ -61,13 +61,13 @@ void pwm1_duty_cycle(unsigned int percent)
         return;
     }
 
-    percent *= 8;
+    percent *= 4;
 #if INVERT_LOW
     TA1CCR1 = percent;
     TA1CCR2 = percent;
 #else
-    TA1CCR1 = 800 - percent;
-    TA1CCR2 = 800 - percent;
+    TA1CCR1 = 400 - percent;
+    TA1CCR2 = 400 - percent;
 #endif
 }
 
@@ -84,7 +84,7 @@ void pwm0_init(unsigned int percent_duty_cycle)
     TA0CCTL1 = CM_0 + CCIS_0 + OUTMOD_6;
     TA0CCTL0 = CM_0 + CCIS_0 + OUTMOD_6;
 
-    TA0CCR0 = 800; /* roughly 10 kHz */
+    TA0CCR0 = 400; /* roughly 20 kHz */
     pwm0_duty_cycle(percent_duty_cycle);
 
     /* TA1CTL, Timer_A3 Control Register
@@ -104,12 +104,12 @@ void pwm0_duty_cycle(unsigned int percent)
         return;
     }
 
-    percent *= 8;
+    percent *= 4;
 #if INVERT_LOW
     TA0CCR1 = percent;
     TA0CCR2 = percent;
 #else
-    TA0CCR1 = 800 - percent;
-    TA0CCR2 = 800 - percent;
+    TA0CCR1 = 400 - percent;
+    TA0CCR2 = 400 - percent;
 #endif
 }

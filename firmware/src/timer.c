@@ -90,7 +90,11 @@ __interrupt void TIMER0_A1_ISR(void);
 #pragma vector=TIMER0_A1_VECTOR
 __interrupt void TIMER0_A1_ISR(void)
 {
+    ADC10CTL0 |= ADC10SC;
     TA0CTL &= ~TAIFG;
+    TA0CTL = TASSEL_2 + ID_0 + MC_0 + TAIE;
+    P1OUT ^= 0x01;
+    //Read ADC Here
     count += 100;
 }
 
@@ -101,5 +105,13 @@ __interrupt void TIMER1_A1_ISR(void);
 __interrupt void TIMER1_A1_ISR(void)
 {
     TA1CTL &= ~TAIFG;
+
+	/* TA0CTL, Timer_A3 Control Register
+	 * SMCLK source, divide by 1, up/down mode
+	 */
+	TA0CTL = TASSEL_2 + ID_0 + MC_3 + TAIE;
+    TA0CCR0 = 370;
     count += 100;
 }
+
+
