@@ -31,6 +31,7 @@
 /** Free running timer count */
 static uint32_t count = 0;
 static char which = 0;
+extern uint32_t integral;
 
 /** Initialize the free running timer based off of timer A0.
  */
@@ -52,7 +53,7 @@ void timera1_init(void)
     TA1CCTL1 = CM_0 + CCIS_0 + OUTMOD_6;
     TA1CCTL0 = CM_0 + CCIS_0 + OUTMOD_6;
     TA1CCR0 = 1599; /* roughtly 10 kHz */
-    TA1CTL = TASSEL_2 + ID_0 + MC_1 + TAIE;
+    TA1CTL = TASSEL_2 + ID_0 + MC_1;
     which = 2;
 }
 
@@ -84,34 +85,38 @@ uint32_t get_time(void)
     return result;
 }
 
-/** Timer A0 interrupt.
+/** Timer 0 A1 interrupt.
  */
 __interrupt void TIMER0_A1_ISR(void);
 #pragma vector=TIMER0_A1_VECTOR
 __interrupt void TIMER0_A1_ISR(void)
 {
-    ADC10CTL0 |= ADC10SC;
     TA0CTL &= ~TAIFG;
-    TA0CTL = TASSEL_2 + ID_0 + MC_0 + TAIE;
-    P1OUT ^= 0x01;
-    //Read ADC Here
+
     count += 100;
 }
 
-/** Timer A0 interrupt.
+/** Timer 1 A1 interrupt.
  */
 __interrupt void TIMER1_A1_ISR(void);
 #pragma vector=TIMER1_A1_VECTOR
 __interrupt void TIMER1_A1_ISR(void)
 {
-    TA1CTL &= ~TAIFG;
+    if (TA1IV == 0x0A)
+    {
+        ADC10CTL0 |= ADC10SC;
+        TA1CCTL0 &= ~TAIFG;
+    }
 
-	/* TA0CTL, Timer_A3 Control Register
-	 * SMCLK source, divide by 1, up/down mode
-	 */
-	TA0CTL = TASSEL_2 + ID_0 + MC_3 + TAIE;
-    TA0CCR0 = 370;
-    count += 100;
+    TA1CCTL0 &= ~CCIFG;
+}
+
+/** Timer A1 interrupt.
+ */
+__interrupt void TIMER1_A0_ISR(void);
+#pragma vector=TIMER1_A0_VECTOR
+__interrupt void TIMER1_A0_ISR(void)
+{
 }
 
 

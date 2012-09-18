@@ -25,14 +25,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdint.h>
 #include "config.h"
 
-#define S1      6
-#define S2      4
-#define S3      5
-#define S4      1
-#define S5      3
-#define S6      2
+extern uint32_t integral;
 
 /** Advance the commutation state.
  * @param move_to valid values are 1-6
@@ -44,6 +40,7 @@ void commutate(unsigned int move_to)
         default:
             break;
         case S1:
+            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_4;
             P2SEL = PCL;
 #if INVERT_HIGH
             P2OUT |= PBH | PCH;
@@ -54,6 +51,7 @@ void commutate(unsigned int move_to)
 #endif
             break;
         case S2:
+            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_5;
             P2SEL = PCL;
 #if INVERT_HIGH
             P2OUT |= PAH | PCH;
@@ -64,6 +62,7 @@ void commutate(unsigned int move_to)
 #endif
             break;
         case S3:
+            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_3;
             P2SEL = PAL;
 #if INVERT_HIGH
             P2OUT |= PAH | PCH;
@@ -74,6 +73,7 @@ void commutate(unsigned int move_to)
 #endif
             break;
         case S4:
+            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_4;
             P2SEL = PAL;
 #if INVERT_HIGH
             P2OUT |= PAH | PBH;
@@ -84,6 +84,7 @@ void commutate(unsigned int move_to)
 #endif
             break;
         case S5:
+            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_5;
             P2SEL = PBL;
 #if INVERT_HIGH
             P2OUT |= PAH | PBH;
@@ -94,6 +95,7 @@ void commutate(unsigned int move_to)
 #endif
             break;
         case S6:
+            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_3;
             P2SEL = PBL;
 #if INVERT_HIGH
             P2OUT |= PBH | PCH;

@@ -33,6 +33,8 @@
 #include "commutate.h"
 #include "tinystdio.h"
 
+uint32_t integral = 0;
+
 /*
  * main.c
  */
@@ -78,21 +80,69 @@ void main(void)
     P2IES = 0;
     P2IFG = 0;
 
-    pwm1_init(60);
+    pwm1_init(30);
     timera0_init();
     serial_init();
     ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_3; //+ ADC10DIV2 + ADC10DIV1 + ADC10DIV0;
     ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable
     ADC10CTL0 |= ENC;                         // ADC10 Enable
-    ADC10AE0 |= 0x08;                         // P1.3 ADC10 option select*/
+    ADC10AE0 |= 0x38;                         // P1.3 ADC10 option select*/
 
     printf("hello world\n");
 
     __enable_interrupt();
 
+    unsigned int hall_last = hall();
+#if 0
+    int i;
+    for (i = 0; i < 20; )
+    {
+
+        unsigned int halla = hall();
+        commutate(halla);
+
+        if (halla != hall_last && (hall_last == S3 || hall_last == S6))
+        {
+            i++;
+            integral = 0;
+        }
+        hall_last = halla;
+    }
+#endif
+    unsigned int state = hall_last;
     for (;;)
     {
-        commutate(hall());
+        if (integral >= 130000)
+        {
+            switch (state)
+            {
+                case S1:
+                    commutate(S6);
+                    state = S6;
+                    break;
+                case S2:
+                    commutate(S1);
+                    state = S1;
+                    break;
+                case S3:
+                    commutate(S2);
+                    state = S2;
+                    break;
+                case S4:
+                    commutate(S3);
+                    state = S3;
+                    break;
+                case S5:
+                    commutate(S4);
+                    state = S4;
+                    break;
+                case S6:
+                    commutate(S5);
+                    state = S5;
+                    break;
+            }
+            integral = 0;
+        }
     }
 
 }
@@ -101,10 +151,7 @@ void main(void)
 #pragma vector=ADC10_VECTOR
 __interrupt void ADC10_ISR(void)
 {
-	//P1OUT ^= 0x40;
-	/*if (ADC10MEM < 0x155)                     // ADC10MEM = A1 > 0.5V?
-	   // P1OUT &= ~0x40;                         // Clear P1.0 LED off
-	  else
-	   // P1OUT |= 0x40;                          // Set P1.0 LED on*/
+    integral += ADC10MEM;
+    ADC10CTL0 &= ~ADC10IFG;
 }
 

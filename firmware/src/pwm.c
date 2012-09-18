@@ -39,7 +39,7 @@ void pwm1_init(unsigned int percent_duty_cycle)
      */
     TA1CCTL2 = CM_0 + CCIS_0 + OUTMOD_6;
     TA1CCTL1 = CM_0 + CCIS_0 + OUTMOD_6;
-    TA1CCTL0 = CM_0 + CCIS_0 + OUTMOD_6;
+    TA1CCTL0 = CM_0 + CCIS_0 + OUTMOD_6 + CCIE;
 
     TA1CCR0 = 400; /* roughly 20 kHz */
     pwm1_duty_cycle(percent_duty_cycle);
@@ -47,7 +47,7 @@ void pwm1_init(unsigned int percent_duty_cycle)
     /* TA1CTL, Timer_A3 Control Register
      * SMCLK source, divide by 1, up/down mode
      */
-    TA1CTL = TASSEL_2 + ID_0 + MC_3 + TAIE;
+    TA1CTL = TASSEL_2 + ID_0 + MC_3 + TAIE;;
 }
 
 /** Update PWM channel 1 duty cycle.

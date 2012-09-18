@@ -46,3 +46,10 @@
 #define HALL_A_SHIFT 6
 #define HALL_B_SHIFT 6
 #define HALL_C_SHIFT 5
+
+#define S1      6
+#define S2      4
+#define S3      5
+#define S4      1
+#define S5      3
+#define S6      2
