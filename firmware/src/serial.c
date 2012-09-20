@@ -41,10 +41,10 @@ void serial_init(void)
     /* setup UART */
     UCA0CTL0 = 0;
     UCA0CTL1 = UCSSEL_2;
-    UCA0BR0 = 131;
-    UCA0BR1 = 6;
-    //UCA0BR0 = 8;
-    //UCA0BR1 = 0;
+    //UCA0BR0 = 131;
+    //UCA0BR1 = 6;
+    UCA0BR0 = 34;
+    UCA0BR1 = 0;
     UCA0MCTL = UCBRS_1;
     IE2 |= UCA0RXIE;
 }

@@ -28,6 +28,9 @@
 #include <msp430.h>
 
 #define SENSORLESS 0
+#define ADC_SAMPLE_DEBUG 0
+#define INTEGRAL_DEBUG 1
+
 
 #define INVERT_HIGH 0
 #define INVERT_LOW  1

@@ -163,8 +163,14 @@ void main(void)
     	    	commutate(state);
     	    	integral_temp=integral;
     	    	integral=0;
-    	    	blank=2;
-    	    	printf("0,%l\n",integral_temp);
+    	    	blank=1;
+
+				#if INTEGRAL_DEBUG
+    	    	putchar(integral_temp>>24);
+    	    	putchar(integral_temp>>16);
+    	    	putchar(integral_temp>>8);
+    	    	putchar(integral_temp);
+				#endif
     	    }
 	    	last_state=state;
         }
@@ -175,11 +181,20 @@ void main(void)
 #pragma vector=ADC10_VECTOR
 __interrupt void ADC10_ISR(void)
 {
+	P1OUT ^=BIT0;
     if (blank<=0)
-    	integral += ADC10MEM;
-    	//putchar((int)ADC10MEM);
+    {
+    	unsigned int sample=ADC10MEM;
+    	integral += sample;
+
+		#if ADC_SAMPLE_DEBUG
+    	putchar(sample>>8);
+    	putchar(sample);
+		#endif
+    }
     else
+    {
     	blank--;
+    }
     ADC10CTL0 &= ~ADC10IFG;
-    P1OUT ^=BIT0;
 }
