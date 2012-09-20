@@ -34,6 +34,8 @@
 #include "tinystdio.h"
 
 uint32_t integral = 0;
+unsigned int blank = 2;
+
 
 /*
  * main.c
@@ -80,7 +82,7 @@ void main(void)
     P2IES = 0;
     P2IFG = 0;
 
-    pwm1_init(30);
+    pwm1_init(70);
     timera0_init();
     serial_init();
     ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_3; //+ ADC10DIV2 + ADC10DIV1 + ADC10DIV0;
@@ -92,6 +94,7 @@ void main(void)
 
     __enable_interrupt();
 
+#if SENSORLESS
     unsigned int hall_last = hall();
 #if 0
     int i;
@@ -144,14 +147,39 @@ void main(void)
             integral = 0;
         }
     }
+#endif
 
+#if !SENSORLESS
+    unsigned int state = S2;
+    unsigned int last_state = S1;
+    uint32_t integral_temp = 0;
+    commutate(last_state);
+
+    for (;;)
+        {
+    		state=hall();
+    		if (last_state != state)
+    	    {
+    	    	commutate(state);
+    	    	integral_temp=integral;
+    	    	integral=0;
+    	    	blank=2;
+    	    	printf("0,%l\n",integral_temp);
+    	    }
+	    	last_state=state;
+        }
+#endif
 }
 
 // ADC10 interrupt service routine
 #pragma vector=ADC10_VECTOR
 __interrupt void ADC10_ISR(void)
 {
-    integral += ADC10MEM;
+    if (blank<=0)
+    	integral += ADC10MEM;
+    	//putchar((int)ADC10MEM);
+    else
+    	blank--;
     ADC10CTL0 &= ~ADC10IFG;
+    P1OUT ^=BIT0;
 }
-

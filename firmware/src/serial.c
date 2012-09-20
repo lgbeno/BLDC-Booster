@@ -43,6 +43,8 @@ void serial_init(void)
     UCA0CTL1 = UCSSEL_2;
     UCA0BR0 = 131;
     UCA0BR1 = 6;
+    //UCA0BR0 = 8;
+    //UCA0BR1 = 0;
     UCA0MCTL = UCBRS_1;
     IE2 |= UCA0RXIE;
 }

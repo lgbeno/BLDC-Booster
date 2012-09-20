@@ -27,6 +27,8 @@
 
 #include <msp430.h>
 
+#define SENSORLESS 0
+
 #define INVERT_HIGH 0
 #define INVERT_LOW  1
 
