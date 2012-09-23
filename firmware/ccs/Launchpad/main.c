@@ -34,8 +34,23 @@
 #include "tinystdio.h"
 
 uint32_t integral = 0;
+uint32_t integral_thresh = 0;
+uint32_t integral_spread = 0;
 unsigned int blank = 2;
 
+
+/* Debug Global Declarations*/
+#if ADC_SAMPLE_DEBUG || INTEGRAL_DEBUG
+unsigned int debug_ref=0;
+unsigned int fill=1;
+#endif
+#if ADC_SAMPLE_DEBUG
+unsigned int debug_buff[DEBUG_BUFFER_DEPTH];
+#endif
+#if INTEGRAL_DEBUG
+uint32_t debug_buff[DEBUG_BUFFER_DEPTH];
+unsigned int sub_ref=0;
+#endif
 
 /*
  * main.c
@@ -67,6 +82,8 @@ void main(void)
     P1SEL = BIT1 | BIT2;
     P1SEL2 = BIT1 | BIT2;
 
+
+
     /* set P2.0 up for PWM */
     P2SEL = 0;
     P2SEL2 = 0;
@@ -82,77 +99,25 @@ void main(void)
     P2IES = 0;
     P2IFG = 0;
 
-    pwm1_init(70);
+    /*initialize the peripherals*/
+    pwm1_init(DUTY_STARTUP);
     timera0_init();
     serial_init();
-    ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_3; //+ ADC10DIV2 + ADC10DIV1 + ADC10DIV0;
-    ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable
-    ADC10CTL0 |= ENC;                         // ADC10 Enable
-    ADC10AE0 |= 0x38;                         // P1.3 ADC10 option select*/
 
-    printf("hello world\n");
+    /*setup the ADC*/
+    ADC10CTL1 = SHS_0 + CONSEQ_0 + DEFAULT_ADC_CHANNEL; //+ ADC10DIV2 + ADC10DIV1 + ADC10DIV0;
+    ADC10CTL0=0;
+    ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE + ENC; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Enable ADC
+    ADC10AE0 |= 0x38;                         // P1.3 ADC10 option select*/
 
     __enable_interrupt();
 
 #if SENSORLESS
-    unsigned int hall_last = hall();
-#if 0
-    int i;
-    for (i = 0; i < 20; )
-    {
 
-        unsigned int halla = hall();
-        commutate(halla);
 
-        if (halla != hall_last && (hall_last == S3 || hall_last == S6))
-        {
-            i++;
-            integral = 0;
-        }
-        hall_last = halla;
-    }
-#endif
-    unsigned int state = hall_last;
-    for (;;)
-    {
-        if (integral >= 130000)
-        {
-            switch (state)
-            {
-                case S1:
-                    commutate(S6);
-                    state = S6;
-                    break;
-                case S2:
-                    commutate(S1);
-                    state = S1;
-                    break;
-                case S3:
-                    commutate(S2);
-                    state = S2;
-                    break;
-                case S4:
-                    commutate(S3);
-                    state = S3;
-                    break;
-                case S5:
-                    commutate(S4);
-                    state = S4;
-                    break;
-                case S6:
-                    commutate(S5);
-                    state = S5;
-                    break;
-            }
-            integral = 0;
-        }
-    }
-#endif
-
-#if !SENSORLESS
+#else
     unsigned int state = S2;
     unsigned int last_state = S1;
-    uint32_t integral_temp = 0;
     commutate(last_state);
 
     for (;;)
@@ -161,16 +126,27 @@ void main(void)
     		if (last_state != state)
     	    {
     	    	commutate(state);
-    	    	integral_temp=integral;
+#if INTEGRAL_DEBUG
+    			if (fill==1)
+    			{
+    				if (debug_ref<DEBUG_BUFFER_DEPTH)
+    				{
+    					debug_buff[debug_ref]=integral;
+    					debug_ref++;
+    				}
+    				else
+    				{
+    					putchar(0xFF);
+    					putchar(0xFF);
+    					putchar(0xFF);
+    					putchar(0xFF);
+    					debug_ref=0;
+    					fill=0;
+    				}
+    			}
+#endif
     	    	integral=0;
-    	    	blank=1;
-
-				#if INTEGRAL_DEBUG
-    	    	putchar(integral_temp>>24);
-    	    	putchar(integral_temp>>16);
-    	    	putchar(integral_temp>>8);
-    	    	putchar(integral_temp);
-				#endif
+    	    	blank=NUM_BLANKING;
     	    }
 	    	last_state=state;
         }
@@ -186,15 +162,70 @@ __interrupt void ADC10_ISR(void)
     {
     	unsigned int sample=ADC10MEM;
     	integral += sample;
-
-		#if ADC_SAMPLE_DEBUG
-    	putchar(sample>>8);
-    	putchar(sample);
-		#endif
+#if STREAM_ADC_SAMPLES
+		putchar(sample>>8);
+		putchar(sample);
+#endif
+#if ADC_SAMPLE_DEBUG
+		if (fill==1)
+		{
+			if (debug_ref<DEBUG_BUFFER_DEPTH)
+			{
+				debug_buff[debug_ref]=sample;
+				debug_ref++;
+			}
+			else
+			{
+				putchar(0xFF);
+				putchar(0xFF);
+				debug_ref=0;
+				fill=0;
+			}
+		}
+#endif
     }
     else
     {
+#if STREAM_ADC_SAMPLES
+		putchar(0xFF);
+		putchar(0xFF);
+#endif
     	blank--;
     }
+
+#if ADC_SAMPLE_DEBUG || INTEGRAL_DEBUG
+    if (fill==0)
+    {
+    	if (debug_ref<DEBUG_BUFFER_DEPTH)
+    	{
+#if INTEGRAL_DEBUG
+    		if (sub_ref==0)
+    		{
+    			putchar(debug_buff[debug_ref]>>24);
+    			putchar(debug_buff[debug_ref]>>16);
+    			sub_ref=1;
+    		}
+    		else
+    		{
+    			putchar(debug_buff[debug_ref]>>8);
+    			putchar(debug_buff[debug_ref]);
+    			sub_ref=0;
+    			debug_ref++;
+    		}
+#endif
+#if ADC_SAMPLE_DEBUG
+			putchar(debug_buff[debug_ref]>>8);
+			putchar(debug_buff[debug_ref]);
+			debug_ref++;
+#endif
+    	}
+    	else
+    	{
+			debug_ref=0;
+			fill=1;
+    	}
+    }
+#endif
+
     ADC10CTL0 &= ~ADC10IFG;
 }

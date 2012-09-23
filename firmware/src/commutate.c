@@ -35,6 +35,9 @@ extern uint32_t integral;
  */
 void commutate(unsigned int move_to)
 {
+#if ADC_MUX_EN
+	ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Disable ADC
+#endif
     switch (move_to)
     {
         default:
@@ -106,4 +109,5 @@ void commutate(unsigned int move_to)
 #endif
             break;
     }
+    ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE + ENC; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Enable ADC
 }

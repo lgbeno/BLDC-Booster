@@ -28,8 +28,15 @@
 #include <msp430.h>
 
 #define SENSORLESS 0
+#define ADC_MUX_EN 0
+#define DEFAULT_ADC_CHANNEL INCH_5
+#define STREAM_ADC_SAMPLES 1
 #define ADC_SAMPLE_DEBUG 0
-#define INTEGRAL_DEBUG 1
+#define DEBUG_BUFFER_DEPTH 90
+#define INTEGRAL_DEBUG 0
+#define NUM_BLANKING 1
+
+#define DUTY_STARTUP 30
 
 
 #define INVERT_HIGH 0
