@@ -29,21 +29,24 @@
 #include "config.h"
 
 extern uint32_t integral;
+extern unsigned int bemf_adc10ctl1;
+extern unsigned int vpwr_adc10ctl1;
+extern unsigned int adc_channel;
+extern unsigned int state;
 
 /** Advance the commutation state.
  * @param move_to valid values are 1-6
  */
 void commutate(unsigned int move_to)
 {
-#if ADC_MUX_EN
-	ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Disable ADC
-#endif
     switch (move_to)
     {
         default:
             break;
         case S1:
-            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_4;
+        	state = 1;
+        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_4;
+        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_5;
             P2SEL = PCL;
 #if INVERT_HIGH
             P2OUT |= PBH | PCH;
@@ -54,7 +57,9 @@ void commutate(unsigned int move_to)
 #endif
             break;
         case S2:
-            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_5;
+        	state = 2;
+        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_5;
+        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_4;
             P2SEL = PCL;
 #if INVERT_HIGH
             P2OUT |= PAH | PCH;
@@ -65,7 +70,9 @@ void commutate(unsigned int move_to)
 #endif
             break;
         case S3:
-            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_3;
+        	state = 3;
+        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_3;
+        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_4;
             P2SEL = PAL;
 #if INVERT_HIGH
             P2OUT |= PAH | PCH;
@@ -76,7 +83,9 @@ void commutate(unsigned int move_to)
 #endif
             break;
         case S4:
-            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_4;
+        	state = 4;
+        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_4;
+        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_3;
             P2SEL = PAL;
 #if INVERT_HIGH
             P2OUT |= PAH | PBH;
@@ -87,7 +96,9 @@ void commutate(unsigned int move_to)
 #endif
             break;
         case S5:
-            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_5;
+        	state = 5;
+        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_5;
+        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_3;
             P2SEL = PBL;
 #if INVERT_HIGH
             P2OUT |= PAH | PBH;
@@ -98,7 +109,9 @@ void commutate(unsigned int move_to)
 #endif
             break;
         case S6:
-            ADC10CTL1 = SHS_0 + CONSEQ_0 + INCH_3;
+        	state = 6;
+        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_3;
+        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_5;
             P2SEL = PBL;
 #if INVERT_HIGH
             P2OUT |= PBH | PCH;
@@ -109,5 +122,4 @@ void commutate(unsigned int move_to)
 #endif
             break;
     }
-    ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE + ENC; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Enable ADC
 }

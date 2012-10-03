@@ -32,6 +32,9 @@
 static uint32_t count = 0;
 static char which = 0;
 extern uint32_t integral;
+extern unsigned int bemf_adc10ctl1;
+extern unsigned int vpwr_adc10ctl1;
+extern unsigned int adc_channel;
 
 /** Initialize the free running timer based off of timer A0.
  */
@@ -102,8 +105,15 @@ __interrupt void TIMER1_A1_ISR(void);
 #pragma vector=TIMER1_A1_VECTOR
 __interrupt void TIMER1_A1_ISR(void)
 {
+
     if (TA1IV == 0x0A)
     {
+#if ADC_MUX_EN
+    	ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Disable ADC
+#endif
+    	ADC10CTL1 = bemf_adc10ctl1;
+        ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE + ENC; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Enable ADC
+    	adc_channel = BEMF;
         ADC10CTL0 |= ADC10SC;
         TA1CCTL0 &= ~TAIFG;
     }
@@ -117,6 +127,15 @@ __interrupt void TIMER1_A0_ISR(void);
 #pragma vector=TIMER1_A0_VECTOR
 __interrupt void TIMER1_A0_ISR(void)
 {
+#if ADC_MUX_EN
+	ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Disable ADC
+#endif
+	ADC10CTL1 = vpwr_adc10ctl1;
+    ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE + ENC; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Enable ADC
+	adc_channel = VPWR;
+    ADC10CTL0 |= ADC10SC;
+    TA1CCTL0 &= ~TAIFG;
+
 }
 
 

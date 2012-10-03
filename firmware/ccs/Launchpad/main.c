@@ -29,7 +29,7 @@
 #include "pwm.h"
 #include "hall.h"
 #include "timer.h"
-#include "serial.h"
+#include "serial.h";
 #include "commutate.h"
 #include "tinystdio.h"
 
@@ -37,6 +37,13 @@ uint32_t integral = 0;
 uint32_t integral_thresh = 0;
 uint32_t integral_spread = 0;
 unsigned int blank = 2;
+unsigned int bemf_adc10ctl1;
+unsigned int vpwr_adc10ctl1;
+unsigned int adc_channel;
+unsigned int vpwr;
+unsigned int center;
+unsigned int state;
+
 
 
 /* Debug Global Declarations*/
@@ -113,7 +120,53 @@ void main(void)
     __enable_interrupt();
 
 #if SENSORLESS
+    unsigned int stat = S2;
+    unsigned int last_state = S1;
+    unsigned int comms = 0;
 
+    //startup sequence
+    commutate(last_state);
+    while (comms < INIT_COMMS)
+    {
+    	state=hall();
+    	if (state!=last_state)
+    	{
+    		commutate(state);
+    		comms++;
+    	}
+    	last_state=state;
+    }
+
+    for (;;)
+    {
+    	if (integral >= INTEGRAL_THRESH)
+    	{
+ 			P1OUT ^=BIT6;
+    		switch(state)
+    		{
+    			case S1:
+    				commutate(S2);
+    				break;
+    			case S2:
+    				commutate(S3);
+    				break;
+    			case S3:
+    				commutate(S4);
+    				break;
+    			case S4:
+    				commutate(S5);
+    				break;
+    			case S5:
+    				commutate(S6);
+    				break;
+    			case S6:
+    				commutate(S1);
+    				break;
+    		}
+ 			integral = 0;
+    	}
+
+    }
 
 #else
     unsigned int state = S2;
@@ -122,6 +175,12 @@ void main(void)
 
     for (;;)
         {
+     		if (integral >= INTEGRAL_THRESH)
+        	{
+     			P1OUT ^=BIT6;
+     			integral = 0;
+        	}
+
     		state=hall();
     		if (last_state != state)
     	    {
@@ -145,7 +204,7 @@ void main(void)
     				}
     			}
 #endif
-    	    	integral=0;
+    	    	//integral=0;
     	    	blank=NUM_BLANKING;
     	    }
 	    	last_state=state;
@@ -157,11 +216,26 @@ void main(void)
 #pragma vector=ADC10_VECTOR
 __interrupt void ADC10_ISR(void)
 {
-	P1OUT ^=BIT0;
     if (blank<=0)
     {
     	unsigned int sample=ADC10MEM;
-    	integral += sample;
+    	if (adc_channel == VPWR)
+    	{
+    		center = sample/2;
+    		vpwr = sample;
+    	}
+    	else
+    	{
+    		if (state % 2 == 1)
+    		{
+    			sample = vpwr - sample;
+    		}
+			if (sample > center)
+			{
+				P1OUT ^=BIT0;
+				integral+=sample;
+			}
+    	}
 #if STREAM_ADC_SAMPLES
 		putchar(sample>>8);
 		putchar(sample);
