@@ -35,10 +35,35 @@
 unsigned int hall(void)
 {
     uint8_t hall;
+    uint8_t ret;
 
     hall =  (HALL_A_PORT & HALL_A_MASK) >> HALL_A_SHIFT;
     hall += (HALL_B_PORT & HALL_B_MASK) >> HALL_B_SHIFT;
     hall += (HALL_C_PORT & HALL_C_MASK) >> HALL_C_SHIFT;
 
-    return hall;
+    switch (hall)
+    {
+    	case 1:
+    		ret = S4;
+    		break;
+    	case 2:
+    		ret = S6;
+    		break;
+    	case 3:
+    		ret = S5;
+    		break;
+    	case 4:
+    		ret = S2;
+    		break;
+    	case 5:
+    		ret = S3;
+    		break;
+    	case 6:
+    		ret = S1;
+    		break;
+    	default:
+    		ret = S1;
+    		break;
+    }
+    return ret;
 }

@@ -53,6 +53,7 @@ def load_integrals(farg, *args):
 def plot_adc(farg, *args):
   import matplotlib
   matplotlib.pyplot.plot(load_adc(farg))
+  matplotlib.pyplot.plot(load_adc(farg),'ro')
   matplotlib.pyplot.title(farg)
   
 def plot_integral(farg, *args):

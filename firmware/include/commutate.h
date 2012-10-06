@@ -33,4 +33,6 @@
  */
 void commutate(unsigned int move_to);
 
+void commutate_dir(unsigned int direction);
+
 #endif /* _commutate_h_ */

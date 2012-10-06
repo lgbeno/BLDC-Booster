@@ -28,19 +28,23 @@
 #include <msp430.h>
 
 
+#define CCW 0
+#define CW 1
+
 #define SENSORLESS 1
+#define NUM_BLANKING 4
+#define INTEGRAL_THRESH 1850
+#define DUTY_STARTUP 50
+#define STARTUP_DIR CW
+
 #define ADC_MUX_EN 1
 #define DEFAULT_ADC_CHANNEL INCH_5
-#define STREAM_ADC_SAMPLES 0
-#define ADC_SAMPLE_DEBUG 0
 #define DEBUG_BUFFER_DEPTH 80
-#define INTEGRAL_DEBUG 1
-#define NUM_BLANKING 1
+#define DEBUG_INTEGRAL 0
+#define DEBUG_VPWR 0
+#define DEBUG_BEMF 0
 
-#define INTEGRAL_THRESH 8500
-#define DUTY_STARTUP 30
-
-#define INIT_COMMS 900
+#define INIT_COMMS 100
 
 #define BEMF 0
 #define VPWR 1
@@ -55,6 +59,13 @@
 #define PCL BIT4
 #define PCH BIT5
 
+#define POS 0
+#define NEG 1
+
+#define ADC_A INCH_5
+#define ADC_B INCH_4
+#define ADC_C INCH_3
+
 #define HALL_A_PORT  P2IN
 #define HALL_B_PORT  P2IN
 #define HALL_C_PORT  P1IN
@@ -65,9 +76,9 @@
 #define HALL_B_SHIFT 6
 #define HALL_C_SHIFT 5
 
-#define S1      6
-#define S2      4
-#define S3      5
-#define S4      1
-#define S5      3
-#define S6      2
+#define S1      0
+#define S2      1
+#define S3      2
+#define S4      3
+#define S5      4
+#define S6      5
