@@ -46,7 +46,7 @@ void serial_init(void)
     UCA0BR0 = 34;
     UCA0BR1 = 0;
     UCA0MCTL = UCBRS_1;
-    IE2 |= UCA0RXIE;
+    //IE2 |= UCA0RXIE;
 }
 
 __interrupt void USCIAB0RX_ISR(void);

@@ -1,5 +1,5 @@
 /** \copyright BSD
- * Copyright (c) 2012, Stuart W. Baker
+ * Copyright (c) 2012, Luke Beno, Stuart W. Baker
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,98 +28,53 @@
 #include <stdint.h>
 #include "config.h"
 
+
+unsigned int state = 0;
+
 extern uint32_t integral;
-extern unsigned int bemf_adc10ctl1;
-extern unsigned int vpwr_adc10ctl1;
-extern unsigned int adc_channel;
-extern unsigned int state;
+
+#if INVERT_HIGH
+	//                                              (    S1   )   (    S2   )   (    S3   )   (    S4   )   (    S5   )   (    S6   )
+	static const unsigned int p2out_set_lut [6] = { (PBH | PCH),  (PAH | PCH),  (PAH | PCH),  (PAH | PBH),  (PAH | PBH),  (PBH | PCH)};
+	static const unsigned int p2out_clr_lut [6] = { (  ~PAH   ),  (  ~PBH   ),  (  ~PBH   ),  (  ~PCH   ),  (  ~PCH   ),  (  ~PAH   )};
+	static const unsigned int p2sel_set_lut [6] = { (   PCL   ),  (   PCL   ),  (   PAL   ),  (   PAL   ),  (   PBL   ),  (   PBL   )};
+//	static const unsigned int bemf_chan_lut [6] = { (  ADC_B  ),  (  ADC_A  ),  (  ADC_C  ),  (  ADC_B  ),  (  ADC_A  ),  (  ADC_C  )};
+//	static const unsigned int vpwr_chan_lut [6] = { (  ADC_A  ),  (  ADC_B  ),  (  ADC_B  ),  (  ADC_C  ),  (  ADC_C  ),  (  ADC_A  )};
+#else
+	//                                              (    S1   )   (    S2   )   (    S3   )   (    S4   )   (    S5   )   (    S6   )
+	static const unsigned int p2out_set_lut [6] = { (   PAH   ),  (    PBH  ),  (   PBH   ),  (   PCH   ),  (   PCH   ),  (   PAH   )};
+	static const unsigned int p2out_clr_lut [6] = {~(PBH | PCH), ~(PAH | PCH), ~(PAH | PCH), ~(PAH | PBH), ~(PAH | PBH), ~(PBH | PCH)};
+	static const unsigned int p2sel_set_lut [6] = { (  PCL   ),   (   PCL   ),  (   PAL   ),  (   PAL   ),  (   PBL   ),  (   PBL   )};
+//	static const unsigned int bemf_chan_lut [6] = { (  ADC_B ),   (  ADC_A  ),  (  ADC_C  ),  (  ADC_B  ),  (  ADC_A  ),  (  ADC_C  )};
+//	static const unsigned int vpwr_chan_lut [6] = { (  ADC_A ),   (  ADC_B  ),  (  ADC_B  ),  (  ADC_C  ),  (  ADC_C  ),  (  ADC_A  )};
+#endif
+
+	void commutate(unsigned int move_to)
+	{
+		P2OUT |= p2out_set_lut[state];
+		P2OUT &= p2out_clr_lut[state];
+		P2SEL  = p2sel_set_lut[state];
+		state = move_to;
+	}
 
 /** Advance the commutation state.
- * @param move_to valid values are 1-6
+ * @param direction valid values are 0-1
  */
-void commutate(unsigned int move_to)
+void commutate_dir(unsigned int direction)
 {
-    switch (move_to)
-    {
-        default:
-            break;
-        case S1:
-        	state = 1;
-        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_4;
-        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_5;
-            P2SEL = PCL;
-#if INVERT_HIGH
-            P2OUT |= PBH | PCH;
-            P2OUT &= ~PAH;
-#else
-            P2OUT &= ~(PBH | PCH);
-            P2OUT |= PAH;
-#endif
-            break;
-        case S2:
-        	state = 2;
-        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_5;
-        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_4;
-            P2SEL = PCL;
-#if INVERT_HIGH
-            P2OUT |= PAH | PCH;
-            P2OUT &= ~PBH;
-#else
-            P2OUT &= ~(PAH | PCH);
-            P2OUT |= PBH;
-#endif
-            break;
-        case S3:
-        	state = 3;
-        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_3;
-        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_4;
-            P2SEL = PAL;
-#if INVERT_HIGH
-            P2OUT |= PAH | PCH;
-            P2OUT &= ~PBH;
-#else
-            P2OUT &= ~(PAH | PCH);
-            P2OUT |= PBH;
-#endif
-            break;
-        case S4:
-        	state = 4;
-        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_4;
-        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_3;
-            P2SEL = PAL;
-#if INVERT_HIGH
-            P2OUT |= PAH | PBH;
-            P2OUT &= ~PCH;
-#else
-            P2OUT &= ~(PAH | PBH);
-            P2OUT |= PCH;
-#endif
-            break;
-        case S5:
-        	state = 5;
-        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_5;
-        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_3;
-            P2SEL = PBL;
-#if INVERT_HIGH
-            P2OUT |= PAH | PBH;
-            P2OUT &= ~PCH;
-#else
-            P2OUT &= ~(PAH | PBH);
-            P2OUT |= PCH;
-#endif
-            break;
-        case S6:
-        	state = 6;
-        	bemf_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_3;
-        	vpwr_adc10ctl1 = SHS_0 + CONSEQ_0 + INCH_5;
-            P2SEL = PBL;
-#if INVERT_HIGH
-            P2OUT |= PBH | PCH;
-            P2OUT &= ~PAH;
-#else
-            P2OUT &= ~(PBH | PCH);
-            P2OUT |= PAH;
-#endif
-            break;
-    }
+	if (direction==0)
+	{
+		if (state != S6)
+			state++;
+		else
+			state = S1;
+	}
+	else
+	{
+		if (state != S1)
+			state--;
+		else
+			state = S6;
+	}
+	commutate(state);
 }

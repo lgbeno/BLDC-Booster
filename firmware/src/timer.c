@@ -1,5 +1,5 @@
 /** \copyright
- * Copyright (c) 2012, Stuart W. Baker
+ * Copyright (c) 2012, Luke Beno, Stuart W. Baker
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,13 @@
 /** Free running timer count */
 static uint32_t count = 0;
 static char which = 0;
-extern uint32_t integral;
-extern unsigned int bemf_adc10ctl1;
-extern unsigned int vpwr_adc10ctl1;
+extern unsigned int state;
 extern unsigned int adc_channel;
+
+
+//                                              (    S1   )   (    S2   )   (    S3   )   (    S4   )   (    S5   )   (    S6   )
+static const unsigned int bemf_chan_lut [6] = { (  ADC_B ),   (  ADC_A  ),  (  ADC_C  ),  (  ADC_B  ),  (  ADC_A  ),  (  ADC_C  )};
+static const unsigned int vpwr_chan_lut [6] = { (  ADC_A ),   (  ADC_B  ),  (  ADC_B  ),  (  ADC_C  ),  (  ADC_C  ),  (  ADC_A  )};
 
 /** Initialize the free running timer based off of timer A0.
  */
@@ -111,7 +114,7 @@ __interrupt void TIMER1_A1_ISR(void)
 #if ADC_MUX_EN
     	ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Disable ADC
 #endif
-    	ADC10CTL1 = bemf_adc10ctl1;
+    	ADC10CTL1 = SHS_0 + CONSEQ_0 + bemf_chan_lut[state];
         ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE + ENC; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Enable ADC
     	adc_channel = BEMF;
         ADC10CTL0 |= ADC10SC;
@@ -130,7 +133,7 @@ __interrupt void TIMER1_A0_ISR(void)
 #if ADC_MUX_EN
 	ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Disable ADC
 #endif
-	ADC10CTL1 = vpwr_adc10ctl1;
+	ADC10CTL1 = SHS_0 + CONSEQ_0 + vpwr_chan_lut[state];
     ADC10CTL0 = SREF_0 + ADC10SHT_2 + ADC10ON + ADC10IE + ENC; //Use AVCC for REF, 16 clocks, Enable ADC, Interrupt Enable, Enable ADC
 	adc_channel = VPWR;
     ADC10CTL0 |= ADC10SC;

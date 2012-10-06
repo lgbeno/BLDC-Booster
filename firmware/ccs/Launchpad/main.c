@@ -1,5 +1,5 @@
 /** \copyright
- * Copyright (c) 2012, Stuart W. Baker
+ * Copyright (c) 2012, Luke Beno, Stuart W. Baker
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,37 +33,39 @@
 #include "commutate.h"
 #include "tinystdio.h"
 
+void empty_buffer(unsigned int size);
+
+extern unsigned int bemf_chan_lut;
+extern unsigned int vpwr_chan_lut;
+extern unsigned int state;
+
+#if DEBUG_INTEGRAL
+uint32_t debug_buffer[DEBUG_BUFFER_DEPTH];
+#else
+unsigned int debug_buffer[DEBUG_BUFFER_DEPTH];
+#endif
+
+unsigned int fill_ptr=1;
+unsigned int dump_ptr=0;
+unsigned int byte_shift=0;
+//                                              (    S1   )   (    S2   )   (    S3   )   (    S4   )   (    S5   )   (    S6   )
+static const unsigned int emf_slope_lut [6] = { (   POS   ),  (   NEG   ),  (   POS   ),  (   NEG   ),  (   POS   ),  (   NEG   )};
+
 uint32_t integral = 0;
-uint32_t integral_thresh = 0;
-uint32_t integral_spread = 0;
 unsigned int blank = 2;
-unsigned int bemf_adc10ctl1;
-unsigned int vpwr_adc10ctl1;
-unsigned int adc_channel;
-unsigned int vpwr;
-unsigned int center;
-unsigned int state;
-
-
-
-/* Debug Global Declarations*/
-#if ADC_SAMPLE_DEBUG || INTEGRAL_DEBUG
-unsigned int debug_ref=0;
-unsigned int fill=1;
-#endif
-#if ADC_SAMPLE_DEBUG
-unsigned int debug_buff[DEBUG_BUFFER_DEPTH];
-#endif
-#if INTEGRAL_DEBUG
-uint32_t debug_buff[DEBUG_BUFFER_DEPTH];
-unsigned int sub_ref=0;
-#endif
+unsigned int vpwr = 0;
+unsigned int comms = 0;
+unsigned int adc_channel = BEMF;
+unsigned int adc_last_state = S1;
 
 /*
  * main.c
  */
 void main(void)
 {
+	unsigned int current_state = S1;
+	unsigned int last_state = S6;
+	unsigned int x = 0;
     /* Disable watchdog */
     WDTCTL = WDTPW + WDTHOLD;
 
@@ -88,8 +90,6 @@ void main(void)
     /* Enable UART */
     P1SEL = BIT1 | BIT2;
     P1SEL2 = BIT1 | BIT2;
-
-
 
     /* set P2.0 up for PWM */
     P2SEL = 0;
@@ -119,96 +119,43 @@ void main(void)
 
     __enable_interrupt();
 
-#if SENSORLESS
-    unsigned int stat = S2;
-    unsigned int last_state = S1;
-    unsigned int comms = 0;
+    debug_buffer[0] = 0xffffffff;
 
+#if SENSORLESS
     //startup sequence
-    commutate(last_state);
+    commutate(S1);
     while (comms < INIT_COMMS)
     {
-    	state=hall();
-    	if (state!=last_state)
+    	for (x=0;x<1000;x++)
     	{
-    		commutate(state);
-    		comms++;
+    		x=x;
     	}
-    	last_state=state;
+    	commutate_dir(STARTUP_DIR);
+
     }
+
 
     for (;;)
     {
-    	if (integral >= INTEGRAL_THRESH)
+    	if (integral>INTEGRAL_THRESH)
     	{
- 			P1OUT ^=BIT6;
-    		switch(state)
-    		{
-    			case S1:
-    				commutate(S2);
-    				break;
-    			case S2:
-    				commutate(S3);
-    				break;
-    			case S3:
-    				commutate(S4);
-    				break;
-    			case S4:
-    				commutate(S5);
-    				break;
-    			case S5:
-    				commutate(S6);
-    				break;
-    			case S6:
-    				commutate(S1);
-    				break;
-    		}
- 			integral = 0;
+    		commutate_dir(STARTUP_DIR);
+    		integral = 0;
     	}
-
     }
 
 #else
-    unsigned int state = S2;
-    unsigned int last_state = S1;
-    commutate(last_state);
-
     for (;;)
-        {
-     		if (integral >= INTEGRAL_THRESH)
-        	{
-     			P1OUT ^=BIT6;
-     			integral = 0;
-        	}
+	{
+    	commutate(hall());
 
-    		state=hall();
-    		if (last_state != state)
-    	    {
-    	    	commutate(state);
-#if INTEGRAL_DEBUG
-    			if (fill==1)
-    			{
-    				if (debug_ref<DEBUG_BUFFER_DEPTH)
-    				{
-    					debug_buff[debug_ref]=integral;
-    					debug_ref++;
-    				}
-    				else
-    				{
-    					putchar(0xFF);
-    					putchar(0xFF);
-    					putchar(0xFF);
-    					putchar(0xFF);
-    					debug_ref=0;
-    					fill=0;
-    				}
-    			}
+#if DEBUG_VPWR || DEBUG_BEMF
+    	empty_buffer(16);
 #endif
-    	    	//integral=0;
-    	    	blank=NUM_BLANKING;
-    	    }
-	    	last_state=state;
-        }
+#if DEBUG_INTEGRAL
+    	empty_buffer(32);
+#endif
+	}
 #endif
 }
 
@@ -216,90 +163,97 @@ void main(void)
 #pragma vector=ADC10_VECTOR
 __interrupt void ADC10_ISR(void)
 {
-    if (blank<=0)
+	if (adc_last_state != state)
+	{
+		blank = NUM_BLANKING;
+		comms++;
+#if DEBUG_INTEGRAL
+		if (fill_ptr != DEBUG_BUFFER_DEPTH)
+			debug_buffer[fill_ptr++] = integral;
+#endif
+	}
+    if (blank==0)
     {
-    	unsigned int sample=ADC10MEM;
+    	unsigned int sample=ADC10MEM  & 0x3FF;
+
+    	P1OUT ^=BIT0;
+
     	if (adc_channel == VPWR)
     	{
-    		center = sample/2;
     		vpwr = sample;
+#if DEBUG_VPWR
+    		if (fill_ptr != DEBUG_BUFFER_DEPTH)
+    			debug_buffer[fill_ptr++] = sample;
+#endif
     	}
     	else
     	{
-    		if (state % 2 == 1)
+    		if (emf_slope_lut [state])
     		{
-    			sample = vpwr - sample;
-    		}
-			if (sample > center)
-			{
-				P1OUT ^=BIT0;
-				integral+=sample;
-			}
-    	}
-#if STREAM_ADC_SAMPLES
-		putchar(sample>>8);
-		putchar(sample);
-#endif
-#if ADC_SAMPLE_DEBUG
-		if (fill==1)
-		{
-			if (debug_ref<DEBUG_BUFFER_DEPTH)
-			{
-				debug_buff[debug_ref]=sample;
-				debug_ref++;
-			}
-			else
-			{
-				putchar(0xFF);
-				putchar(0xFF);
-				debug_ref=0;
-				fill=0;
-			}
-		}
-#endif
-    }
-    else
-    {
-#if STREAM_ADC_SAMPLES
-		putchar(0xFF);
-		putchar(0xFF);
-#endif
-    	blank--;
-    }
+    			if (sample > (vpwr>>1))
+    			{
+					if (sample < vpwr)
+						sample = vpwr - sample;
+					else
+						sample = 0;
 
-#if ADC_SAMPLE_DEBUG || INTEGRAL_DEBUG
-    if (fill==0)
-    {
-    	if (debug_ref<DEBUG_BUFFER_DEPTH)
-    	{
-#if INTEGRAL_DEBUG
-    		if (sub_ref==0)
-    		{
-    			putchar(debug_buff[debug_ref]>>24);
-    			putchar(debug_buff[debug_ref]>>16);
-    			sub_ref=1;
+					integral+=sample;
+    			}
+    			else
+    			{
+    				integral=0;
+    			}
     		}
     		else
     		{
-    			putchar(debug_buff[debug_ref]>>8);
-    			putchar(debug_buff[debug_ref]);
-    			sub_ref=0;
-    			debug_ref++;
+    			if (sample < (vpwr>>1))
+				{
+					integral+=sample;
+				}
+    			else
+    			{
+    				integral=0;
+    			}
     		}
+#if DEBUG_BEMF
+			if (fill_ptr != DEBUG_BUFFER_DEPTH)
+				debug_buffer[fill_ptr++] = sample;
 #endif
-#if ADC_SAMPLE_DEBUG
-			putchar(debug_buff[debug_ref]>>8);
-			putchar(debug_buff[debug_ref]);
-			debug_ref++;
-#endif
-    	}
-    	else
-    	{
-			debug_ref=0;
-			fill=1;
     	}
     }
-#endif
-
+    else
+    {
+    	blank--;
+    }
     ADC10CTL0 &= ~ADC10IFG;
+    adc_last_state = state;
+}
+
+void empty_buffer(unsigned int size)
+{
+	if (fill_ptr == DEBUG_BUFFER_DEPTH)
+	{
+		if (dump_ptr < DEBUG_BUFFER_DEPTH)
+		{
+			if (IFG2 & UCA0TXIFG)
+			{
+				byte_shift -= 8;
+				UCA0TXBUF = debug_buffer[dump_ptr]>>byte_shift;
+				if (byte_shift == 0 )
+				{
+					dump_ptr++;
+					byte_shift = size;
+				}
+			}
+		}
+		else
+		{
+			fill_ptr = 1;
+		}
+	}
+	else
+	{
+		dump_ptr = 0;
+		byte_shift = size;
+	}
 }

@@ -1,5 +1,5 @@
 /** \copyright
- * Copyright (c) 2012, Stuart W. Baker
+ * Copyright (c) 2012, Luke Beno, Stuart W. Baker
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,5 +32,7 @@
  * @param move_to valid values are 1-6
  */
 void commutate(unsigned int move_to);
+
+void commutate_dir(unsigned int direction);
 
 #endif /* _commutate_h_ */
