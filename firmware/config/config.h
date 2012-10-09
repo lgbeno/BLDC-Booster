@@ -28,21 +28,23 @@
 #include <msp430.h>
 
 
-#define CCW 0
-#define CW 1
+#define CCW 1
+#define CW 0
 
 #define SENSORLESS 1
-#define NUM_BLANKING 4
-#define INTEGRAL_THRESH 1850
-#define DUTY_STARTUP 50
+#define NUM_BLANKING 1
+#define INTEGRAL_THRESH 600
+#define DUTY_STARTUP 22
 #define STARTUP_DIR CW
 
 #define ADC_MUX_EN 1
 #define DEFAULT_ADC_CHANNEL INCH_5
-#define DEBUG_BUFFER_DEPTH 80
+#define DEBUG_BUFFER_DEPTH 170
 #define DEBUG_INTEGRAL 0
 #define DEBUG_VPWR 0
 #define DEBUG_BEMF 0
+#define DEBUG_FILTERED_BEMF 0
+#define DEBUG_SPEED 0
 
 #define INIT_COMMS 100
 

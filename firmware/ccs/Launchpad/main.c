@@ -39,9 +39,12 @@ extern unsigned int bemf_chan_lut;
 extern unsigned int vpwr_chan_lut;
 extern unsigned int state;
 
+unsigned int direction = STARTUP_DIR;
+
 #if DEBUG_INTEGRAL
 uint32_t debug_buffer[DEBUG_BUFFER_DEPTH];
-#else
+#endif
+#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED
 unsigned int debug_buffer[DEBUG_BUFFER_DEPTH];
 #endif
 
@@ -51,6 +54,8 @@ unsigned int byte_shift=0;
 //                                              (    S1   )   (    S2   )   (    S3   )   (    S4   )   (    S5   )   (    S6   )
 static const unsigned int emf_slope_lut [6] = { (   POS   ),  (   NEG   ),  (   POS   ),  (   NEG   ),  (   POS   ),  (   NEG   )};
 
+unsigned int time = 0;
+unsigned int speed = 0;
 uint32_t integral = 0;
 unsigned int blank = 2;
 unsigned int vpwr = 0;
@@ -63,11 +68,10 @@ unsigned int adc_last_state = S1;
  */
 void main(void)
 {
-	unsigned int current_state = S1;
-	unsigned int last_state = S6;
 	unsigned int x = 0;
-    /* Disable watchdog */
-    WDTCTL = WDTPW + WDTHOLD;
+    /* SETUP watchdog */
+    WDTCTL = WDTPW + WDTTMSEL + WDTIS1;
+    IE1 = WDTIE;
 
     /* setup clock for 16 MHz internal DCO */
     DCOCTL = 0;
@@ -118,8 +122,9 @@ void main(void)
     ADC10AE0 |= 0x38;                         // P1.3 ADC10 option select*/
 
     __enable_interrupt();
-
+#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || INTEGRAL_DEBUG
     debug_buffer[0] = 0xffffffff;
+#endif
 
 #if SENSORLESS
     //startup sequence
@@ -141,7 +146,19 @@ void main(void)
     	{
     		commutate_dir(STARTUP_DIR);
     		integral = 0;
+    		speed = time;
+    		time=0;
+#if DEBUG_SPEED
+		if (fill_ptr != DEBUG_BUFFER_DEPTH)
+			debug_buffer[fill_ptr++] = speed;
+#endif
     	}
+#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED
+    	empty_buffer(16);
+#endif
+#if DEBUG_INTEGRAL
+    	empty_buffer(32);
+#endif
     }
 
 #else
@@ -157,6 +174,13 @@ void main(void)
 #endif
 	}
 #endif
+}
+
+// Watchdog ISR
+#pragma vector=WDT_VECTOR
+__interrupt void WDT_ISR(void)
+{
+	time++;
 }
 
 // ADC10 interrupt service routine
@@ -176,8 +200,6 @@ __interrupt void ADC10_ISR(void)
     {
     	unsigned int sample=ADC10MEM  & 0x3FF;
 
-    	P1OUT ^=BIT0;
-
     	if (adc_channel == VPWR)
     	{
     		vpwr = sample;
@@ -188,7 +210,11 @@ __interrupt void ADC10_ISR(void)
     	}
     	else
     	{
-    		if (emf_slope_lut [state])
+#if DEBUG_BEMF
+			if (fill_ptr != DEBUG_BUFFER_DEPTH)
+				debug_buffer[fill_ptr++] = sample;
+#endif
+    		if (emf_slope_lut [state] ^ direction)
     		{
     			if (sample > (vpwr>>1))
     			{
@@ -215,7 +241,7 @@ __interrupt void ADC10_ISR(void)
     				integral=0;
     			}
     		}
-#if DEBUG_BEMF
+#if DEBUG_FILTERED_BEMF
 			if (fill_ptr != DEBUG_BUFFER_DEPTH)
 				debug_buffer[fill_ptr++] = sample;
 #endif
@@ -231,6 +257,7 @@ __interrupt void ADC10_ISR(void)
 
 void empty_buffer(unsigned int size)
 {
+#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || INTEGRAL_DEBUG
 	if (fill_ptr == DEBUG_BUFFER_DEPTH)
 	{
 		if (dump_ptr < DEBUG_BUFFER_DEPTH)
@@ -238,7 +265,9 @@ void empty_buffer(unsigned int size)
 			if (IFG2 & UCA0TXIFG)
 			{
 				byte_shift -= 8;
+
 				UCA0TXBUF = debug_buffer[dump_ptr]>>byte_shift;
+
 				if (byte_shift == 0 )
 				{
 					dump_ptr++;
@@ -256,4 +285,5 @@ void empty_buffer(unsigned int size)
 		dump_ptr = 0;
 		byte_shift = size;
 	}
+#endif
 }

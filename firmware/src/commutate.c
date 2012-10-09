@@ -51,6 +51,7 @@ extern uint32_t integral;
 
 	void commutate(unsigned int move_to)
 	{
+		P1OUT ^=BIT6;
 		P2OUT |= p2out_set_lut[state];
 		P2OUT &= p2out_clr_lut[state];
 		P2SEL  = p2sel_set_lut[state];
@@ -62,7 +63,7 @@ extern uint32_t integral;
  */
 void commutate_dir(unsigned int direction)
 {
-	if (direction==0)
+	if (direction==CCW)
 	{
 		if (state != S6)
 			state++;
