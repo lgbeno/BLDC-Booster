@@ -26,6 +26,7 @@
  */
 
 #include "serial.h"
+#include "pwm.h"
 
 char rxBuf[SERIAL_BUF_SIZE];
 char txBuf[SERIAL_BUF_SIZE];
@@ -33,6 +34,10 @@ int txIndexWr = 0;
 int txIndexRd = 0;
 int rxIndexWr = 0;
 int rxIndexRd = 0;
+char byte_cnt = 0;
+char cmd = 0;
+unsigned int rxData=0;
+extern unsigned int threshold;
 
 /** Initialize serial driver.
  */
@@ -41,25 +46,53 @@ void serial_init(void)
     /* setup UART */
     UCA0CTL0 = 0;
     UCA0CTL1 = UCSSEL_2;
-    //UCA0BR0 = 131;
-    //UCA0BR1 = 6;
-    UCA0BR0 = 34;
-    UCA0BR1 = 0;
+    UCA0BR0 = 131;
+    UCA0BR1 = 6;
+    //UCA0BR0 = 34;
+    //UCA0BR1 = 0;
     UCA0MCTL = UCBRS_1;
-    //IE2 |= UCA0RXIE;
+    IE2 |= UCA0RXIE;
 }
 
 __interrupt void USCIAB0RX_ISR(void);
 #pragma vector=USCIAB0RX_VECTOR
 __interrupt void USCIAB0RX_ISR(void)
 {
+	char byte=UCA0RXBUF;
+	if ((byte & BIT7)==BIT7)
+	{
+		byte_cnt=16;
+		cmd=byte&0x3F;
+		rxData=0;
+	}
+	else if (byte_cnt>0)
+	{
+		byte_cnt-=4;
+		rxData+=((byte&0x0F)<<byte_cnt);
+		if (byte_cnt==0)
+		{
+			switch (cmd)
+			{
+				case 0x00:
+					pwm1_init(rxData);
+					break;
+				case 0x01:
+					threshold = rxData;
+					break;
+				default:
+					break;
+			}
+
+		}
+	}
+
     while (!(IFG2 & UCA0TXIFG))
     {
-        rxBuf[rxIndexWr++] = UCA0RXBUF;
-        if (rxIndexWr >= SERIAL_BUF_SIZE)
-        {
-            rxIndexWr = 0;
-        }
+
+        //if (rxIndexWr >= SERIAL_BUF_SIZE)
+        //{
+        //    rxIndexWr = 0;
+        //}
     }
 }
 

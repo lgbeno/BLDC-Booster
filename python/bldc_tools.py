@@ -54,13 +54,13 @@ def plot_adc(farg, *args):
   import matplotlib
   matplotlib.pyplot.plot(load_adc(farg))
   matplotlib.pyplot.plot(load_adc(farg),'ro')
-  matplotlib.pyplot.title(farg)
+  #matplotlib.pyplot.title(farg)
   
 def plot_integral(farg, *args):
   import matplotlib
   data=load_integrals(farg)
   matplotlib.pyplot.plot(data[:len(data)-1])
-  matplotlib.pyplot.title(farg)
+  #matplotlib.pyplot.title(farg)
   
 def hist_integral(farg, *args):
   import matplotlib

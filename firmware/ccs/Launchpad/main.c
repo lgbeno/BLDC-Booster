@@ -39,29 +39,27 @@ extern unsigned int bemf_chan_lut;
 extern unsigned int vpwr_chan_lut;
 extern unsigned int state;
 
-unsigned int direction = STARTUP_DIR;
+uint8_t direction = STARTUP_DIR;
 
-#if DEBUG_INTEGRAL
-uint32_t debug_buffer[DEBUG_BUFFER_DEPTH];
-#endif
-#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED
+#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || DEBUG_INTEGRAL || DEBUG_FILTERED_BEMF
 unsigned int debug_buffer[DEBUG_BUFFER_DEPTH];
 #endif
 
-unsigned int fill_ptr=1;
-unsigned int dump_ptr=0;
-unsigned int byte_shift=0;
+uint8_t fill_ptr=1;
+uint8_t dump_ptr=0;
+uint8_t byte_shift=0;
 //                                              (    S1   )   (    S2   )   (    S3   )   (    S4   )   (    S5   )   (    S6   )
 static const unsigned int emf_slope_lut [6] = { (   POS   ),  (   NEG   ),  (   POS   ),  (   NEG   ),  (   POS   ),  (   NEG   )};
 
 unsigned int time = 0;
 unsigned int speed = 0;
-uint32_t integral = 0;
-unsigned int blank = 2;
+unsigned int integral = 0;
+unsigned int threshold = INTEGRAL_THRESH;
+uint8_t blank = 2;
 unsigned int vpwr = 0;
 unsigned int comms = 0;
-unsigned int adc_channel = BEMF;
-unsigned int adc_last_state = S1;
+uint8_t adc_channel = BEMF;
+uint8_t adc_last_state = S1;
 
 /*
  * main.c
@@ -122,8 +120,8 @@ void main(void)
     ADC10AE0 |= 0x38;                         // P1.3 ADC10 option select*/
 
     __enable_interrupt();
-#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || INTEGRAL_DEBUG
-    debug_buffer[0] = 0xffffffff;
+#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || DEBUG_INTEGRAL || DEBUG_FILTERED_BEMF
+    debug_buffer[0] = 0xffff;
 #endif
 
 #if SENSORLESS
@@ -142,22 +140,8 @@ void main(void)
 
     for (;;)
     {
-    	if (integral>INTEGRAL_THRESH)
-    	{
-    		commutate_dir(STARTUP_DIR);
-    		integral = 0;
-    		speed = time;
-    		time=0;
-#if DEBUG_SPEED
-		if (fill_ptr != DEBUG_BUFFER_DEPTH)
-			debug_buffer[fill_ptr++] = speed;
-#endif
-    	}
-#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED
+#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || DEBUG_INTEGRAL || DEBUG_FILTERED_BEMF
     	empty_buffer(16);
-#endif
-#if DEBUG_INTEGRAL
-    	empty_buffer(32);
 #endif
     }
 
@@ -166,11 +150,8 @@ void main(void)
 	{
     	commutate(hall());
 
-#if DEBUG_VPWR || DEBUG_BEMF
+#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || DEBUG_INTEGRAL || DEBUG_FILTERED_BEMF
     	empty_buffer(16);
-#endif
-#if DEBUG_INTEGRAL
-    	empty_buffer(32);
 #endif
 	}
 #endif
@@ -187,15 +168,13 @@ __interrupt void WDT_ISR(void)
 #pragma vector=ADC10_VECTOR
 __interrupt void ADC10_ISR(void)
 {
+	P1OUT ^= BIT6;
 	if (adc_last_state != state)
 	{
 		blank = NUM_BLANKING;
 		comms++;
-#if DEBUG_INTEGRAL
-		if (fill_ptr != DEBUG_BUFFER_DEPTH)
-			debug_buffer[fill_ptr++] = integral;
-#endif
 	}
+
     if (blank==0)
     {
     	unsigned int sample=ADC10MEM  & 0x3FF;
@@ -224,6 +203,10 @@ __interrupt void ADC10_ISR(void)
 						sample = 0;
 
 					integral+=sample;
+#if DEBUG_FILTERED_BEMF
+					if (fill_ptr != DEBUG_BUFFER_DEPTH)
+						debug_buffer[fill_ptr++] = sample;
+#endif
     			}
     			else
     			{
@@ -235,16 +218,32 @@ __interrupt void ADC10_ISR(void)
     			if (sample < (vpwr>>1))
 				{
 					integral+=sample;
+#if DEBUG_FILTERED_BEMF
+					if (fill_ptr != DEBUG_BUFFER_DEPTH)
+						debug_buffer[fill_ptr++] = sample;
+#endif
 				}
     			else
     			{
     				integral=0;
     			}
     		}
-#if DEBUG_FILTERED_BEMF
+
+#if DEBUG_INTEGRAL
 			if (fill_ptr != DEBUG_BUFFER_DEPTH)
-				debug_buffer[fill_ptr++] = sample;
+				debug_buffer[fill_ptr++] = integral;
 #endif
+	    	if (integral>threshold)
+	    	{
+	    		commutate_dir(STARTUP_DIR);
+	    		integral = 0;
+	    		speed = time;
+	    		time=0;
+	#if DEBUG_SPEED
+			if (fill_ptr != DEBUG_BUFFER_DEPTH)
+				debug_buffer[fill_ptr++] = speed;
+	#endif
+	    	}
     	}
     }
     else
@@ -253,11 +252,12 @@ __interrupt void ADC10_ISR(void)
     }
     ADC10CTL0 &= ~ADC10IFG;
     adc_last_state = state;
+	P1OUT ^= BIT6;
 }
 
 void empty_buffer(unsigned int size)
 {
-#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || INTEGRAL_DEBUG
+#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || DEBUG_INTEGRAL || DEBUG_FILTERED_BEMF
 	if (fill_ptr == DEBUG_BUFFER_DEPTH)
 	{
 		if (dump_ptr < DEBUG_BUFFER_DEPTH)

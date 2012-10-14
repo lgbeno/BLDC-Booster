@@ -31,8 +31,8 @@
 /** Free running timer count */
 static uint32_t count = 0;
 static char which = 0;
-extern unsigned int state;
-extern unsigned int adc_channel;
+extern uint8_t state;
+extern uint8_t adc_channel;
 
 
 //                                              (    S1   )   (    S2   )   (    S3   )   (    S4   )   (    S5   )   (    S6   )
@@ -138,7 +138,6 @@ __interrupt void TIMER1_A0_ISR(void)
 	adc_channel = VPWR;
     ADC10CTL0 |= ADC10SC;
     TA1CCTL0 &= ~TAIFG;
-
 }
 
 
