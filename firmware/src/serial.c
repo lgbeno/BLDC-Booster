@@ -38,6 +38,10 @@ char byte_cnt = 0;
 char cmd = 0;
 unsigned int rxData=0;
 extern unsigned int threshold;
+extern unsigned int fill_ptr;
+extern unsigned int dump_ptr;
+extern unsigned int debug_select;
+extern unsigned int startup;
 
 /** Initialize serial driver.
  */
@@ -78,6 +82,13 @@ __interrupt void USCIAB0RX_ISR(void)
 					break;
 				case 0x01:
 					threshold = rxData;
+					break;
+				case 0x02:
+					debug_select = rxData;
+					fill_ptr=1;
+					break;
+				case 0x03:
+					startup = rxData;
 					break;
 				default:
 					break;

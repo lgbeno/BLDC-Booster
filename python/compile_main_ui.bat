@@ -1,0 +1,1 @@
+pyuic4 -o bldc_booster_ui.py BLDC_booster.ui

@@ -31,20 +31,25 @@
 #define CCW 1
 #define CW 0
 
-#define SENSORLESS 1
 #define NUM_BLANKING 1
-#define INTEGRAL_THRESH 1800
-#define DUTY_STARTUP 50
-#define STARTUP_DIR CW
+#define INTEGRAL_THRESH 900
+#define DUTY_STARTUP 0
+#define STARTUP_DIR CCW
 
 #define ADC_MUX_EN 1
 #define DEFAULT_ADC_CHANNEL INCH_4
 #define DEBUG_BUFFER_DEPTH 170
-#define DEBUG_INTEGRAL 0
-#define DEBUG_VPWR 0
-#define DEBUG_BEMF 0
-#define DEBUG_FILTERED_BEMF 0
-#define DEBUG_SPEED 0
+
+#define SENSORED 0
+#define SENSORLESS 1
+
+#define DEBUG_NONE 0
+#define DEBUG_VPWR 1
+#define DEBUG_BEMF 2
+#define DEBUG_BEMF_VPWR 3
+#define DEBUG_FILTERED_BEMF 4
+#define DEBUG_SPEED 5
+#define DEBUG_INTEGRAL 6
 
 #define INIT_COMMS 100
 

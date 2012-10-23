@@ -41,12 +41,10 @@ extern unsigned int state;
 
 uint8_t direction = STARTUP_DIR;
 
-#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || DEBUG_INTEGRAL || DEBUG_FILTERED_BEMF
 unsigned int debug_buffer[DEBUG_BUFFER_DEPTH];
-#endif
 
-uint8_t fill_ptr=1;
-uint8_t dump_ptr=0;
+unsigned int fill_ptr=DEBUG_BUFFER_DEPTH;
+unsigned int dump_ptr=DEBUG_BUFFER_DEPTH;
 uint8_t byte_shift=0;
 //                                              (    S1   )   (    S2   )   (    S3   )   (    S4   )   (    S5   )   (    S6   )
 static const unsigned int emf_slope_lut [6] = { (   POS   ),  (   NEG   ),  (   POS   ),  (   NEG   ),  (   POS   ),  (   NEG   )};
@@ -58,6 +56,9 @@ unsigned int threshold = INTEGRAL_THRESH;
 uint8_t blank = 2;
 unsigned int vpwr = 0;
 unsigned int comms = 0;
+unsigned int operation_mode = 0;
+unsigned int debug_select = DEBUG_NONE;
+unsigned int startup = 0;
 uint8_t adc_channel = BEMF;
 uint8_t adc_last_state = S1;
 
@@ -120,41 +121,27 @@ void main(void)
     ADC10AE0 |= 0x38;                         // P1.3 ADC10 option select*/
 
     __enable_interrupt();
-#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || DEBUG_INTEGRAL || DEBUG_FILTERED_BEMF
     debug_buffer[0] = 0xffff;
-#endif
 
-#if SENSORLESS
     //startup sequence
     commutate(S1);
-    while (comms < INIT_COMMS)
+
+    for (;;)
     {
-    	for (x=0;x<1000;x++)
+    	while (startup!=0)
     	{
-    		x=x;
+    		for (x=0;x<600;x++)
+			{
+				x=x;
+			}
+			commutate_dir(STARTUP_DIR);
+    		startup--;
     	}
-    	commutate_dir(STARTUP_DIR);
-
-    }
-
-
-    for (;;)
-    {
-#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || DEBUG_INTEGRAL || DEBUG_FILTERED_BEMF
-    	empty_buffer(16);
-#endif
-    }
-
-#else
-    for (;;)
-	{
+#if !SENSORLESS
     	commutate(hall());
-
-#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || DEBUG_INTEGRAL || DEBUG_FILTERED_BEMF
+#endif
     	empty_buffer(16);
-#endif
-	}
-#endif
+    }
 }
 
 // Watchdog ISR
@@ -182,17 +169,19 @@ __interrupt void ADC10_ISR(void)
     	if (adc_channel == VPWR)
     	{
     		vpwr = sample;
-#if DEBUG_VPWR
-    		if (fill_ptr != DEBUG_BUFFER_DEPTH)
-    			debug_buffer[fill_ptr++] = sample;
-#endif
+    		if (debug_select==DEBUG_VPWR || debug_select==DEBUG_BEMF_VPWR)
+    		{
+				if (fill_ptr != DEBUG_BUFFER_DEPTH)
+					debug_buffer[fill_ptr++] = sample;
+    		}
     	}
     	else
     	{
-#if DEBUG_BEMF
-			if (fill_ptr != DEBUG_BUFFER_DEPTH)
-				debug_buffer[fill_ptr++] = sample;
-#endif
+    		if (debug_select==DEBUG_BEMF || debug_select==DEBUG_BEMF_VPWR)
+    		{
+				if (fill_ptr != DEBUG_BUFFER_DEPTH)
+					debug_buffer[fill_ptr++] = sample;
+    		}
     		if (emf_slope_lut [state] ^ direction)
     		{
     			if (sample > (vpwr>>1))
@@ -203,10 +192,12 @@ __interrupt void ADC10_ISR(void)
 						sample = 0;
 
 					integral+=sample;
-#if DEBUG_FILTERED_BEMF
-					if (fill_ptr != DEBUG_BUFFER_DEPTH)
-						debug_buffer[fill_ptr++] = sample;
-#endif
+
+		    		if (debug_select==DEBUG_FILTERED_BEMF)
+		    		{
+						if (fill_ptr != DEBUG_BUFFER_DEPTH)
+							debug_buffer[fill_ptr++] = sample;
+		    		}
     			}
     			else
     			{
@@ -218,10 +209,11 @@ __interrupt void ADC10_ISR(void)
     			if (sample < (vpwr>>1))
 				{
 					integral+=sample;
-#if DEBUG_FILTERED_BEMF
-					if (fill_ptr != DEBUG_BUFFER_DEPTH)
-						debug_buffer[fill_ptr++] = sample;
-#endif
+		    		if (debug_select==DEBUG_FILTERED_BEMF)
+		    		{
+						if (fill_ptr != DEBUG_BUFFER_DEPTH)
+							debug_buffer[fill_ptr++] = sample;
+		    		}
 				}
     			else
     			{
@@ -229,20 +221,26 @@ __interrupt void ADC10_ISR(void)
     			}
     		}
 
-#if DEBUG_INTEGRAL
-			if (fill_ptr != DEBUG_BUFFER_DEPTH)
-				debug_buffer[fill_ptr++] = integral;
-#endif
+    		if (debug_select==DEBUG_INTEGRAL)
+    		{
+				if (fill_ptr != DEBUG_BUFFER_DEPTH)
+					debug_buffer[fill_ptr++] = integral;
+    		}
 	    	if (integral>threshold)
 	    	{
-	    		commutate_dir(STARTUP_DIR);
+				#if SENSORLESS
+	    		if (startup==0)
+	    			commutate_dir(STARTUP_DIR);
+				#endif
+
 	    		integral = 0;
 	    		speed = time;
 	    		time=0;
-	#if DEBUG_SPEED
-			if (fill_ptr != DEBUG_BUFFER_DEPTH)
-				debug_buffer[fill_ptr++] = speed;
-	#endif
+				if (debug_select==DEBUG_SPEED)
+				{
+					if (fill_ptr != DEBUG_BUFFER_DEPTH)
+						debug_buffer[fill_ptr++] = speed;
+				}
 	    	}
     	}
     }
@@ -257,33 +255,34 @@ __interrupt void ADC10_ISR(void)
 
 void empty_buffer(unsigned int size)
 {
-#if DEBUG_VPWR || DEBUG_BEMF || DEBUG_SPEED || DEBUG_INTEGRAL || DEBUG_FILTERED_BEMF
-	if (fill_ptr == DEBUG_BUFFER_DEPTH)
+	if (debug_select!=DEBUG_NONE)
 	{
-		if (dump_ptr < DEBUG_BUFFER_DEPTH)
+		if (fill_ptr == DEBUG_BUFFER_DEPTH)
 		{
-			if (IFG2 & UCA0TXIFG)
+			if (dump_ptr < DEBUG_BUFFER_DEPTH)
 			{
-				byte_shift -= 8;
-
-				UCA0TXBUF = debug_buffer[dump_ptr]>>byte_shift;
-
-				if (byte_shift == 0 )
+				if (IFG2 & UCA0TXIFG)
 				{
-					dump_ptr++;
-					byte_shift = size;
+					byte_shift -= 8;
+
+					UCA0TXBUF = debug_buffer[dump_ptr]>>byte_shift;
+
+					if (byte_shift == 0 )
+					{
+						dump_ptr++;
+						byte_shift = size;
+					}
 				}
+			}
+			else
+			{
+				debug_select = DEBUG_NONE;
 			}
 		}
 		else
 		{
-			fill_ptr = 1;
+			dump_ptr = 0;
+			byte_shift = size;
 		}
 	}
-	else
-	{
-		dump_ptr = 0;
-		byte_shift = size;
-	}
-#endif
 }
