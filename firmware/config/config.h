@@ -32,8 +32,8 @@
 #define CW 0
 
 #define NUM_BLANKING 1
-#define INTEGRAL_THRESH 900
-#define DUTY_STARTUP 0
+#define INTEGRAL_THRESH 0
+#define DUTY_STARTUP 30
 #define STARTUP_DIR CCW
 
 #define ADC_MUX_EN 1

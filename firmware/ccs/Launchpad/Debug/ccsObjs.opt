@@ -1,0 +1,1 @@
+"./src/timer.obj" "./src/serial.obj" "./src/pwm.obj" "./src/hall.obj" "./src/commutate.obj" "./tinyclib/puts.obj" "./tinyclib/putchar.obj" "./tinyclib/printf.obj" "./tinyclib/gets.obj" "./tinyclib/getchar.obj" "./main.obj" -l"libc.a" "../lnk_msp430g2553.cmd" 
