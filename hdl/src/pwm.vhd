@@ -57,16 +57,16 @@ architecture rtl of pwm is
         
         -- Compare counter against the low side threshold
         if (cnt < cmp0) then
-          pwm_out_n <= '1';
+          pwm_out <= '1';
         else
-          pwm_out_n <= '0';
+          pwm_out <= '0';
         end if;
         
         -- Compare counter against the high side threshold
         if (cnt >= cmp1) then
-          pwm_out <= '1';
+          pwm_out_n <= '1';
         else
-          pwm_out <= '0';
+          pwm_out_n <= '0';
         end if;  
         
         --Increment (or decrement) the counter based on the slope register
